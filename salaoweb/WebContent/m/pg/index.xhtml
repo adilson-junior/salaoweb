@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pm="http://primefaces.org/mobile">
+
+<f:view renderKitId="PRIMEFACES_MOBILE" />
+
+<h:head>
+<title>Salão</title>
+</h:head>
+
+<h:body>
+
+	<pm:page id="inicio">
+		<pm:header fixed="true">
+			<p:tabMenu activeIndex="0">
+				<p:menuitem value="Início" icon="ui-icon-home" url="/m/pg/index.jsf" iconPos="top"/>
+				<p:menuitem value="Agenda" icon="ui-icon-calendar" url="/m/pg/agenda.jsf" iconPos="top"/>	
+				<p:menuitem value="Financeiro" icon="ui-icon-grid" url="/m/pg/financeiro.jsf" iconPos="top"/>			
+			</p:tabMenu>
+		</pm:header>	
+			
+		<pm:content>
+			
+			<h:form>	
+				<p:panel header="Clientes Agendados" style="text-align:center;">
+					<p:outputLabel value="#{magendaMB.qtdAgedas}" id="qtdAgendas"/>
+				</p:panel>			
+				<p:commandButton value="Atualizar" actionListener="#{magendaMB.carregar()}" update="qtdAgendas" icon="ui-icon-refresh"/>
+				<p:button value="Alterar Senha" outcome="pm:alterar_senha" icon="ui-icon-edit"/>
+				<p:commandButton value="Sair" actionListener="#{mloginMB.logout()}" icon="ui-icon-minus"/>
+			</h:form>			
+		</pm:content>
+
+		<pm:footer title="Salão Web" fixed="true"/>
+	</pm:page>
+	
+	<pm:page id="alterar_senha">
+		<pm:header fixed="true" title="Alterar Senha">
+			<p:button value="&nbsp;" outcome="pm:inicio" icon="ui-icon-arrow-l"/>
+		</pm:header>	
+			
+		<pm:content>
+			<p:panel header="Login">				
+				<h:form id="formAlterarSenha">
+					<p:growl id="growl" showDetail="true" autoUpdate="false" showSummary="false"/>
+					<pm:field>
+				    	<p:outputLabel for="senhaAtual" value="Senha Atual" />
+					    <p:password id="senhaAtual" value="#{mloginMB.senhaAtual}" required="true" requiredMessage="Informe a senha atual"/>
+					</pm:field>					 
+					<pm:field>
+					    <p:outputLabel for="novaSenha" value="Nova Senha" />
+					    <p:password id="novaSenha" value="#{mloginMB.novaSenha}" validatorMessage="Senha: somente letras e números" maxlength="6" required="true" requiredMessage="Informe a nova senha">
+					    	<f:validateRegex pattern="^[a-zA-Z0-9]+$"/>
+					    </p:password>
+					</pm:field>
+					<p:commandButton value="Enviar" actionListener="#{mloginMB.alterarSenha()}" update="growl, formAlterarSenha"/>
+				</h:form>				
+			</p:panel>
+		</pm:content>
+
+		<pm:footer title="Salão Web" fixed="true"/>
+	</pm:page>
+
+</h:body>
+
+</html>

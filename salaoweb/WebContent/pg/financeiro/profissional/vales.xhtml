@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:composition template="/WEB-INF/template/principal.xhtml">	
+		<ui:define name="head">
+			<link type="text/css" rel="stylesheet" href="#{request.contextPath}/css/postagem.css" />
+			<script type="">
+				PrimeFaces.locales['pt_BR'] = {
+                closeText: 'Fechar',
+                prevText: 'Anterior',
+                nextText: 'Próximo',
+                currentText: 'Começo',
+                monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+                monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun', 'Jul','Ago','Set','Out','Nov','Dez'],
+                dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+                dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+                dayNamesMin: ['D','S','T','Q','Q','S','S'],
+                weekHeader: 'Semana',
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: '',
+                timeOnlyTitle: 'Só Horas',
+                timeText: 'Tempo',
+                hourText: 'Hora',
+                minuteText: 'Minuto',
+                secondText: 'Segundo',
+                currentText: 'Data Atual',
+                ampm: false,
+                month: 'Mês',
+                week: 'Semana',
+                day: 'Dia',
+                allDayText : 'Todo Dia'
+            };
+			</script>
+		</ui:define>	
+		<ui:define name="conteudo-esquerdo">	
+			<p:panel>
+				<h:form id="formEventos">
+					<h:panelGrid columns="1">
+						<p:outputLabel value="Data Inicial"/>
+						<p:calendar value="#{valeMB.dataInicio}" locale="pt_BR" navigator="true" pattern="dd/MM/yyyy" yearRange="c-5:c+5" 
+								required="true" requiredMessage="Data deve ser informado"/>
+						<p:outputLabel value="Data Final"/>
+						<p:calendar value="#{valeMB.dataFinal}" locale="pt_BR" navigator="true" pattern="dd/MM/yyyy" yearRange="c-5:c+5" 
+								required="true" requiredMessage="Data deve ser informado"/>						
+				        <p:outputLabel></p:outputLabel>
+				        <p:outputLabel value="Profissional"/>
+						<p:autoComplete value="#{valeMB.profissional}" completeMethod="#{valeMB.pesquisarProfissional}" converter="profissionalConverter"
+			        	var="profissional" itemValue="#{profissional}" itemLabel="#{profissional.nome}" 
+			        	dropdown="true" forceSelection="true" minQueryLength="2" id="profissional"/>
+			        	<p:outputLabel></p:outputLabel>
+				        <p:commandButton value="Atualizar" actionListener="#{valeMB.listar()}" icon="fa fa-refresh" update=":formTabs, :messages"/>
+					</h:panelGrid>				
+				</h:form>			
+			</p:panel>	
+			<p:spacer height="10"/>		
+			<h:panelGrid>
+				<p:commandButton value="Novo Vale&nbsp;" icon="fa fa-long-arrow-down" onclick="PF('valeDialog').show()" update=":formValeDialog"/>					
+			</h:panelGrid>				
+		</ui:define>	
+		<ui:define name="conteudo">		
+			<div class="conteudo-cadastros">			
+				<h2 style="margin:0;"><span style="color: #848484;">Financeiro &gt;  Profissional &gt; </span> Vales (Adiantamento)</h2>
+				<p:separator style="width:980px; float:left; height:10px;"/>					
+				<p:spacer height="10"/>			
+				<p:messages id="messages" showDetail="true" autoUpdate="false" showSummary="false"/>
+				<h:form id="formTabs">
+					<p:dataTable id="listaVales" var="vale" value="#{valeMB.vales}" scrollable="true" scrollHeight="350">  
+				     	<p:column headerText="Id" width="70"> 			             
+			       		 	<h:outputText value="#{vale.id}"/>
+			        	</p:column>	
+				     	<p:column headerText="Data"> 			             
+			       		 	<h:outputText value="#{vale.data}">
+			       		 		<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+			       		 	</h:outputText>  
+			        	</p:column>	
+			        	<p:column headerText="Profissional"> 			             
+			       		 	<h:outputText value="#{vale.profissional.nome}"/>
+			        	</p:column>
+			        		<p:column headerText="Autorizaçõa"> 			             
+			       		 	<h:outputText value="#{vale.usuarioAutoriza}"/>
+			        	</p:column>
+				        <p:column headerText="Valor" style="text-align: right !important;"> 			             
+			       		 	<h:outputText value="#{vale.valor}" style="text-align: center;">
+			       		 		<f:convertNumber type="currency" currencySymbol=""/>
+			       		 	</h:outputText>      
+			        	</p:column>			        
+			        	 <p:column headerText="Excluir" width="45"  > 		
+					        <p:commandButton icon="fa fa-close" title="Excluir" oncomplete="PF('excluirValeDialog').show()" update=":formExValeDialog">
+				            	<f:setPropertyActionListener target="#{valeMB.vale}" value="#{vale}"/>
+				            </p:commandButton>		         	  			            
+				        </p:column>	
+				        <p:columnGroup type="footer">
+				            <p:row>           				            
+				                <p:column colspan="5" style="text-align:right" footerText="Total: #{valeMB.total}"/>
+				            </p:row>
+				        </p:columnGroup>			        			        	
+			        </p:dataTable>	
+				</h:form>			
+			</div>
+			<p:dialog widgetVar="valeDialog" header="Vale" showEffect="clip" hideEffect="clip" resizable="false" appendTo="@(body)" modal="true" closable="false">
+				<h:form id="formValeDialog">	
+					<h:panelGrid columns="1" cellspacing="8">
+						<p:outputLabel value="Valor" for="svalor"/>
+						<p:inputNumber value="#{valeMB.vale.valor}" required="true" requiredMessage="Informe o valor" id="svalor" autocomplete="off"/>
+						<p:outputLabel value="Profissional" for="completeProfissional"/>
+						<p:autoComplete value="#{valeMB.profissionalVale}" completeMethod="#{valeMB.pesquisarProfissional}" converter="profissionalConverter"
+			        	var="profissional" itemValue="#{profissional}" itemLabel="#{profissional.nome}" 
+			        	dropdown="true" forceSelection="true" minQueryLength="2" id="completeProfissional" required="true" requiredMessage="Selecione um profissional"/>
+						<h:outputText id="display" />
+					</h:panelGrid>			
+					<p:spacer height="10"/>	
+			        <p:fieldset legend="Autorização" style="margin-bottom:20px">
+			        	<h:panelGrid columns="2" cellspacing="8">
+							<p:outputLabel value="Usuário"/>
+							<p:inputText value="#{valeMB.nome}" autocomplete="off"/>
+							<p:outputLabel value="Senha"/>
+							<p:password value="#{valeMB.senha}"/>	
+						</h:panelGrid>
+			        </p:fieldset>
+			        <h:panelGrid columns="2" cellspacing="8">
+						<p:commandButton value="Enviar" icon="fa fa-check" actionListener="#{valeMB.salvar()}" oncomplete="PF('valeDialog').hide()" update=":formTabs, :messages"/>
+						<p:commandButton value="Cancelar" icon="fa fa-close" actionListener="#{valeMB.cancelar()}" oncomplete="PF('valeDialog').hide()"/>
+					</h:panelGrid>			        
+		        </h:form>	
+		    </p:dialog>
+		    <p:dialog widgetVar="excluirValeDialog" header="Vale" showEffect="clip" hideEffect="clip" resizable="false" appendTo="@(body)" modal="true" closable="false">
+				<h:form id="formExValeDialog">					
+			        <p:fieldset legend="Autorização" style="margin-bottom:20px">
+			        	<h:panelGrid columns="2" cellspacing="8">
+							<p:outputLabel value="Usuario"/>
+							<p:inputText value="#{valeMB.nome}" autocomplete="off"/>
+							<p:outputLabel value="Senha"/>
+							<p:password value="#{valeMB.senha}" autocomplete="off"/>	
+						</h:panelGrid>
+			        </p:fieldset>
+			        <h:panelGrid columns="2" cellspacing="8">
+						<p:commandButton value="Enviar" actionListener="#{valeMB.excluir()}" 
+						icon="fa fa-check" oncomplete="PF('excluirValeDialog').hide()" update=":formTabs, :messages"/>	
+						<p:commandButton value="Cancelar" actionListener="#{valeMB.cancelar()}" 
+						icon="fa fa-close" oncomplete="PF('excluirValeDialog').hide()" update=":messages"/>					
+					</h:panelGrid>			        
+		        </h:form>	
+		    </p:dialog>			
+		</ui:define>
+	</ui:composition>
+</html>

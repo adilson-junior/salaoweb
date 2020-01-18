@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='ISO-8859-1' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+<f:view contentType="text/html; charset=ISO-8859-1">
+	<h:head>
+		<!--  <link rel="shortcut icon" href="#{request.contextPath}/img/favi.png" type="image/x-icon" />-->
+		<link type="text/css" rel="stylesheet" href="#{request.contextPath}/css/default.css" />
+		<meta http-equiv="Cache-Control" content="No-Cache" />
+		<meta http-equiv="Pragma" content="No-Cache" />
+		<meta http-equiv="Expires" content="0" />
+		<meta name='description'	content='' />		
+		<title>Salão Web</title>
+		<ui:insert name="head"/>
+	</h:head>	
+	<body>	
+		<p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />               
+		<p:dialog appendTo="@(body)" modal="true" widgetVar="statusDialog" header="Aguarde..." draggable="false" closable="false">  
+		    <p:graphicImage value="/img/ajaxloadingbar.gif" />  
+		</p:dialog>
+			
+		<p:layout fullPage="true">			
+			<p:layoutUnit position="north" size="55" styleClass="ui-widget-content-layout">		
+					<h:form>  
+					    <p:menubar>
+					    	<p:menuitem value="Início" url="/" icon="fa fa-home"/>
+					    	 <p:submenu label="Cadastros" icon="fa fa-file">
+					            <p:menuitem value="Cliente" icon="fa fa-male" url="/pg/cadastros/cliente.jsf"/>					                
+					            <p:menuitem value="Profissional" icon="fa fa-smile-o" url="/pg/cadastros/profissional.jsf" rendered="#{ehAdmin}"/>
+					            <p:separator />
+					            <p:menuitem value="Categoria" icon="fa fa-tags" url="/pg/cadastros/categoria.jsf" rendered="#{ehAdmin}"/>
+					            <p:menuitem value="Serviço" icon="fa fa-star" url="/pg/cadastros/servico.jsf" rendered="#{ehAdmin}"/>
+					            <p:menuitem value="Produto" icon="fa fa-star" url="/pg/cadastros/produto.jsf" rendered="#{ehAdmin}"/>
+					            <p:separator />
+					            <p:menuitem value="Banco" icon="fa fa-bank" url="/pg/cadastros/banco.jsf" rendered="#{ehAdmin}"/>
+					            <p:menuitem value="Bandeira do Cartão" icon="fa fa-flag" url="/pg/cadastros/bandeira-cartao.jsf" rendered="#{ehAdmin}"/>
+					            <p:separator />
+					            <p:menuitem value="Usuário" url="/pg/cadastros/usuario.jsf" icon="fa fa-user" rendered="#{ehAdmin}"/>					           		            
+					        </p:submenu>
+					    	<p:menuitem value="Agenda" url="/pg/agenda.jsf" icon="fa fa-book"/>
+					    	<p:menuitem value="Comanda" icon="fa fa-calculator" url="/pg/comanda.jsf"/>				       
+					        <p:submenu label="&nbsp;Caixa" icon="fa fa-money">	
+					        	<p:menuitem value="&nbsp;Saldo" url="/pg/caixa/saldo.jsf" icon="fa fa-money" />			      		        
+						        <p:menuitem value="&nbsp;Extrato" url="/pg/caixa/extrato.jsf" icon="fa fa-list-alt" />
+						        <p:menuitem value="&nbsp;Entrada e Saída" url="/pg/caixa/entrada-saida.jsf" icon="fa fa-arrows-v" />		
+					        </p:submenu>				 
+					        <p:submenu label="Financeiro" icon="fa fa-usd" rendered="#{ehAdmin}">
+					        	<p:submenu label="Histórico" icon="fa fa-calendar">
+					        		<p:menuitem value="Vendas" url="/pg/financeiro/historico/vendas.jsf" icon="fa fa-history"/>					        		
+					        		<p:menuitem value="&nbsp;Faturamento" url="/pg/financeiro/historico/faturamento.jsf" icon="fa fa-bar-chart"/>
+					        		<p:menuitem title="Faturamento menos Pagamentos" value="&nbsp;Fatur. menos Pag." url="/pg/financeiro/historico/faturamento-pagamento.jsf" icon="fa fa-bar-chart"/>
+					        		<p:menuitem value="&nbsp;Reforços" url="/pg/financeiro/historico/reforcos.jsf" icon="fa fa-money"/>
+					        		<p:menuitem value="&nbsp;Sangrias" url="/pg/financeiro/historico/sangrias.jsf" icon="fa fa-money"/>
+					        		<p:menuitem value="&nbsp;Pagamentos" url="/pg/financeiro/historico/pagamentos.jsf" icon="fa fa-money"/>
+					        	</p:submenu>
+					        	<p:submenu label="Profissional" icon="fa fa-suitcase">
+					        		<p:menuitem value="Extrato" url="/pg/financeiro/profissional/extrato.jsf" icon="fa fa-list-alt"/>
+					        		<p:menuitem value="&nbsp;Vales (Adiantamento)" url="/pg/financeiro/profissional/vales.jsf" icon="fa fa-money"/>
+					        		<p:menuitem value="&nbsp;Outros (Lançamentos)" url="/pg/financeiro/profissional/outros.jsf" icon="fa fa-money"/>
+					        	</p:submenu>					        	
+					        	<p:menuitem value="Cheques Pendentes" url="/pg/financeiro/cheque-pendente.jsf" icon="fa fa-exchange"/>					        						        	
+					        	<p:menuitem value="Pagameto" url="/pg/financeiro/pagamento.jsf" icon="fa fa-dollar"/>		
+					        	<p:menuitem value="&nbsp;Contas a Pagar" url="/pg/financeiro/contas-a-pagar.jsf" icon="fa fa-money"/>			          
+					        </p:submenu>	   
+					        <f:facet name="options">	
+					        	<p:outputLabel value="Usuário:&nbsp;#{loginMB.usuario.nome} (#{loginMB.usuario.nomeLogin})&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" style="font-weight: bold; color: #0040FF;"/>				        
+					            <p:commandButton action="#{loginMB.sair()}" value="Sair do Sistema" icon="ui-icon-extlink" immediate="true"/>
+					        </f:facet>
+					    </p:menubar>
+					</h:form>			
+			</p:layoutUnit>		
+			<p:layoutUnit position="west" size="270" resizable="true" collapsible="true" styleClass="ui-widget-content-layout ui-nav-esq">	
+				<ui:insert name="conteudo-esquerdo"/>
+			</p:layoutUnit>	
+			<p:layoutUnit position="center" styleClass="ui-widget-content-layout">			
+				<ui:insert name="conteudo"/>				 				
+    		</p:layoutUnit>
+		</p:layout>		
+	</body>
+</f:view>
+</html>

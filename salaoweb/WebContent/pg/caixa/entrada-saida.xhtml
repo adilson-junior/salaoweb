@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:composition template="/WEB-INF/template/principal.xhtml">		
+		<ui:define name="conteudo-esquerdo">
+			<h:form>
+				<h:panelGrid>
+					<p:commandButton value="Reforço" icon="fa fa-long-arrow-up" onclick="PF('reforcoDialog').show()" update=":formReforcoDialog"/>
+					<p:commandButton value="Sangria&nbsp;" icon="fa fa-long-arrow-down" onclick="PF('sangriaDialog').show()" update=":formSangriaDialog"/>					
+				</h:panelGrid>
+			</h:form>		
+		</ui:define>	
+		<ui:define name="conteudo">		
+			<div class="conteudo-cadastros">					
+				<h2 style="margin:0;"><span style="color: #848484;">Caixa &gt; </span> Entrada e Saída</h2>	
+				<p:separator style="width:980px; float:left; height:10px;"/>					
+				<p:spacer height="10"/>			
+				<p:messages id="messages" showDetail="true" autoUpdate="false" showSummary="false"/>
+				<h:form id="formTabs">
+					<p:tabView>					
+						<p:tab title="Reforço" id="tbReforco">
+							<p:dataTable id="listaReforcos" var="reforco" value="#{entradaSaidaMB.reforcos}" scrollable="true" scrollHeight="350" style="width: 500px;">  
+						     	<p:column headerText="Id" width="70"> 			             
+					       		 	<h:outputText value="#{reforco.id}"/>
+					        	</p:column>	
+						     	<p:column headerText="Data"> 			             
+					       		 	<h:outputText value="#{reforco.data}">
+					       		 		<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+					       		 	</h:outputText>  
+					        	</p:column>	
+						        <p:column headerText="Valor" style="text-align: right !important;"> 			             
+					       		 	<h:outputText value="#{reforco.valor}">
+					       		 		<f:convertNumber type="currency" currencySymbol=""/>
+					       		 	</h:outputText>      
+					        	</p:column>					      
+						        <p:column headerText="Excluir" width="45" style="text-align: center;"> 		
+							        <p:commandButton icon="fa fa-close" title="Excluir" oncomplete="PF('excluirReforcoDialog').show()">
+						            	<f:setPropertyActionListener target="#{entradaSaidaMB.reforco}" value="#{reforco}"/>
+						            </p:commandButton>		         	  			            
+						        </p:column>  			        	
+					        </p:dataTable>
+						</p:tab>
+						<p:tab title="Sangria" id="tbSangria">
+							<p:dataTable id="listaSangrias" var="sangria" value="#{entradaSaidaMB.sangrias}" scrollable="true" scrollHeight="350">  
+						     	<p:column headerText="Id" width="70"> 			             
+					       		 	<h:outputText value="#{sangria.id}"/>
+					        	</p:column>	
+						     	<p:column headerText="Data"> 			             
+					       		 	<h:outputText value="#{sangria.data}">
+					       		 		<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+					       		 	</h:outputText>  
+					        	</p:column>	
+					        	<p:column headerText="Motivo"> 			             
+					       		 	<h:outputText value="#{sangria.motivo}"/>
+					        	</p:column>	
+						        <p:column headerText="Valor" style="text-align: right !important;"> 			             
+					       		 	<h:outputText value="#{sangria.valor}">
+					       		 		<f:convertNumber type="currency" currencySymbol=""/>
+					       		 	</h:outputText>      
+					        	</p:column>					        	 					        	
+						        <p:column headerText="Excluir" width="45"  > 		
+							        <p:commandButton icon="fa fa-close" title="Excluir" oncomplete="PF('excluirSangriaDialog').show()">
+						            	<f:setPropertyActionListener target="#{entradaSaidaMB.sangria}" value="#{sangria}"/>
+						            </p:commandButton>		         	  			            
+						        </p:column>			        	
+					        </p:dataTable>
+						</p:tab>						
+					</p:tabView>	
+				</h:form>			
+			</div>
+			 <p:dialog widgetVar="reforcoDialog" header="Refoço" showEffect="clip" hideEffect="clip" resizable="false" appendTo="@(body)" modal="true" closable="false">
+				<h:form id="formReforcoDialog">	
+					<h:panelGrid columns="2" cellspacing="8">
+						<p:outputLabel value="Valor" for="rvalor"/>
+						<p:inputNumber value="#{entradaSaidaMB.reforco.valor}" requiredMessage="Informe o valor" id="rvalor" required="true" autocomplete="off"/>						
+					</h:panelGrid>			
+					<p:spacer height="10"/>	
+			        <p:fieldset legend="Autorização" style="margin-bottom:20px">
+			        	<h:panelGrid columns="2" cellspacing="8">
+							<p:outputLabel value="Usuario"/>
+							<p:inputText value="#{entradaSaidaMB.nome}" autocomplete="off"/>
+							<p:outputLabel value="Senha"/>
+							<p:password value="#{entradaSaidaMB.senha}"/>	
+						</h:panelGrid>
+			        </p:fieldset>
+			        <h:panelGrid columns="2" cellspacing="8">
+						<p:commandButton value="Enviar" icon="fa fa-check" actionListener="#{entradaSaidaMB.salvarReforco()}" oncomplete="PF('reforcoDialog').hide()" update=":formTabs, :messages"/>
+						<p:commandButton value="Cancelar" icon="fa fa-close" actionListener="#{entradaSaidaMB.cancelarReforco()}" oncomplete="PF('reforcoDialog').hide()"/>
+					</h:panelGrid>			        
+		        </h:form>	
+		    </p:dialog>		     
+		    <p:dialog widgetVar="sangriaDialog" header="Sangria" showEffect="clip" hideEffect="clip" resizable="false" appendTo="@(body)" modal="true" closable="false">
+				<h:form id="formSangriaDialog">	
+					<h:panelGrid columns="1" cellspacing="8">
+						<p:outputLabel value="Valor" for="svalor"/>
+						<p:inputNumber value="#{entradaSaidaMB.sangria.valor}" required="true" requiredMessage="Informe o valor" id="svalor" autocomplete="off"/>
+						<p:outputLabel value="Motivo"/>
+						<p:inputTextarea value="#{entradaSaidaMB.sangria.motivo}" rows="5" cols="30" counter="display" maxlength="200" counterTemplate="{0} Caracteres usados." required="true" requiredMessage="Informe o motivo"/>
+						<h:outputText id="display" />
+					</h:panelGrid>			
+					<p:spacer height="10"/>	
+			        <p:fieldset legend="Autorização" style="margin-bottom:20px">
+			        	<h:panelGrid columns="2" cellspacing="8">
+							<p:outputLabel value="Usuario"/>
+							<p:inputText value="#{entradaSaidaMB.nome}" autocomplete="off"/>
+							<p:outputLabel value="Senha"/>
+							<p:password value="#{entradaSaidaMB.senha}"/>	
+						</h:panelGrid>
+			        </p:fieldset>
+			        <h:panelGrid columns="2" cellspacing="8">
+						<p:commandButton value="Enviar" icon="fa fa-check" actionListener="#{entradaSaidaMB.salvarSangria()}" oncomplete="PF('sangriaDialog').hide()" update=":formTabs, :messages"/>
+						<p:commandButton value="Cancelar" icon="fa fa-close" actionListener="#{entradaSaidaMB.cancelarSangria()}" oncomplete="PF('sangriaDialog').hide()"/>
+					</h:panelGrid>			        
+		        </h:form>	
+		    </p:dialog>
+		    <p:dialog widgetVar="excluirSangriaDialog" header="Sangria" showEffect="clip" hideEffect="clip" resizable="false" appendTo="@(body)" modal="true" closable="false">
+				<h:form id="formExSangriaDialog">					
+			        <p:fieldset legend="Autorização" style="margin-bottom:20px">
+			        	<h:panelGrid columns="2" cellspacing="8">
+							<p:outputLabel value="Usuario"/>
+							<p:inputText value="#{entradaSaidaMB.nome}" autocomplete="off"/>
+							<p:outputLabel value="Senha"/>
+							<p:password value="#{entradaSaidaMB.senha}"/>	
+						</h:panelGrid>
+			        </p:fieldset>
+			        <h:panelGrid columns="2" cellspacing="8">
+						<p:commandButton value="Enviar" actionListener="#{entradaSaidaMB.excluirSangria()}" 
+						icon="fa fa-check" oncomplete="PF('excluirSangriaDialog').hide()" update=":formTabs, :messages"/>	
+						<p:commandButton value="Cancelar" actionListener="#{entradaSaidaMB.cancelarSangria()}" 
+						icon="fa fa-close" oncomplete="PF('excluirSangriaDialog').hide()" update=":messages"/>					
+					</h:panelGrid>			        
+		        </h:form>	
+		    </p:dialog>	
+	        <p:dialog widgetVar="excluirReforcoDialog" header="Reforço" showEffect="clip" hideEffect="clip" resizable="false" appendTo="@(body)" modal="true" closable="false">
+				<h:form id="formExReforcoDialog">					
+			        <p:fieldset legend="Autorização" style="margin-bottom:20px">
+			        	<h:panelGrid columns="2" cellspacing="8">
+							<p:outputLabel value="Usuario"/>
+							<p:inputText value="#{entradaSaidaMB.nome}" autocomplete="off"/>
+							<p:outputLabel value="Senha"/>
+							<p:password value="#{entradaSaidaMB.senha}"/>	
+						</h:panelGrid>
+			        </p:fieldset>
+			        <h:panelGrid columns="2" cellspacing="8">
+						<p:commandButton value="Enviar" actionListener="#{entradaSaidaMB.excluirReforco()}"
+						icon="fa fa-check" oncomplete="PF('excluirReforcoDialog').hide()" update=":formTabs, :messages"/>	
+						<p:commandButton value="Cancelar" actionListener="#{entradaSaidaMB.cancelarReforco()}"
+						icon="fa fa-close" oncomplete="PF('excluirReforcoDialog').hide()" update=":messages"/>				
+					</h:panelGrid>			        
+		        </h:form>	
+		    </p:dialog>
+		</ui:define>
+	</ui:composition>
+</html>

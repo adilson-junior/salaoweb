@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+<h:body>
+	<ui:composition template="/WEB-INF/template/principal.xhtml">
+			<ui:define name="head">
+				<script type="">
+				PrimeFaces.locales['pt'] = {
+        		closeText: 'Fechar',
+        		prevText: 'Anterior',
+        		nextText: 'Próximo',
+        		currentText: 'Atual',
+        		monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+        		monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun', 'Jul','Ago','Set','Out','Nov','Dez'],
+        		dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+        		dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+        		dayNamesMin: ['D','S','T','Q','Q','S','S'],
+       		 	weekHeader: 'Semana',
+        		firstDay: 1,
+        		isRTL: false,
+        		showMonthAfterYear: false,
+        		yearSuffix: '',
+        		month: 'Mês',
+       			week: 'Semana',
+        		day: 'Dia',
+        		allDayText : 'Todo dia'
+    			};
+				PrimeFaces.locales['pt_BR'] = {
+                closeText: 'Fechar',
+                prevText: 'Anterior',
+                nextText: 'Próximo',
+                currentText: 'Começo',
+                monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+                monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun', 'Jul','Ago','Set','Out','Nov','Dez'],
+                dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+                dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+                dayNamesMin: ['D','S','T','Q','Q','S','S'],
+                weekHeader: 'Semana',
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: '',
+                timeOnlyTitle: 'Só Horas',
+                timeText: 'Tempo',
+                hourText: 'Hora',
+                minuteText: 'Minuto',
+                secondText: 'Segundo',
+                currentText: 'Data Atual',
+                ampm: false,
+                month: 'Mês',
+                week: 'Semana',
+                day: 'Dia',
+                allDayText : 'Todo Dia'
+            };
+			
+			</script>
+			<style type="text/css">
+				.status{
+					width: 200px; 
+					min-height:40px; 
+					padding: 5px;
+					-moz-border-radius: 3px;
+					-webkit-border-radius: 3px;
+					border-radius: 3px;	
+					text-align: center;
+				}
+			</style>
+		</ui:define>	
+		<ui:define name="conteudo-esquerdo">
+			<p:messages id="messages" showDetail="true" autoUpdate="false" showSummary="false" closable="true"/>
+			<h:form id="fomSelects">
+				<p:panel header="Carregar Agenda Profissional">			
+					<h:panelGrid columns="1">						
+			        	<p:autoComplete value="#{agendaMB.profissional}" completeMethod="#{agendaMB.pesquisarProfissional}" converter="profissionalConverter"
+			        	var="profissional" itemValue="#{profissional}" itemLabel="#{profissional.nome}" dropdown="true" forceSelection="true" minQueryLength="2" id="completeProfissional">
+			        		<p:ajax event="itemSelect" listener="#{agendaMB.selecionarProfissional()}" oncomplete="PF('myschedule').update();" update="completeCliente, :titulo"/>
+			        	</p:autoComplete>				        				     
+			        </h:panelGrid>	
+				</p:panel>	
+				<p:spacer height="10"/>
+				<p:panel header="Carregar Agenda Cliente">				
+					<h:panelGrid columns="1">					        					        	            
+			            <p:autoComplete value="#{agendaMB.cliente}" completeMethod="#{agendaMB.pesquisarCliente}" converter="clienteConverter"
+			        	var="cliente" itemValue="#{cliente}" itemLabel="#{cliente.nome}" dropdown="true" forceSelection="true" minQueryLength="2" id="completeCliente">
+			        		<p:ajax event="itemSelect" listener="#{agendaMB.selecionarCliente()}" oncomplete="PF('myschedule').update();" update="completeProfissional, :titulo"/>
+			        	</p:autoComplete>				     
+			        </h:panelGrid>	
+				</p:panel>	
+			</h:form>		
+			<p:spacer height="10"/>
+			<p:panel header="Status da Agenda">
+				<h:panelGrid columns="1">
+					<div class="status" style="background: #6ba5c1;">Agendamento normal.</div>
+					<p:outputLabel value=" "/>
+					<div class="status" style="background: #FFD700;">Agendamento encaixado.</div>
+					<p:outputLabel value=" "/>
+					<div class="status" style="background: #FFA500;">Agendamento concluído.</div>
+					<p:outputLabel value=" "/>
+					<div class="status" style="background: #E9967A;">Agendamento concluído.<br/>Não é possível editar.</div>
+				</h:panelGrid>
+			</p:panel>						
+		</ui:define>
+		<ui:define name="conteudo">	
+			<h3 style="margin:0;">
+				<p:outputLabel value="#{agendaMB.titulo}" id="titulo"/>
+			</h3>
+			<p:separator style="width:900px; float:left; height:10px;"/>		
+			<h:form id="formSchedule">
+				<p:schedule id="schedule" value="#{agendaMB.eventModel}" widgetVar="myschedule" locale="pt" style="width: 900px;" 
+				axisFormat="HH:mm" minTime="09:00" maxTime="21:00" timeZone="America/Sao_Paulo" 
+				rightHeaderTemplate="agendaWeek,agendaDay" view="agendaWeek" draggable="false" resizable="false">
+					<p:ajax event="dateSelect" listener="#{agendaMB.onDateSelect}" update=":formNovaAgendaDialog" oncomplete="PF('novaAgendaDialog').show();" />
+          			<p:ajax event="eventSelect" listener="#{agendaMB.onEventSelect}" update=":formEditarAgendaDialog" oncomplete="PF('editarAgendaDialog').show();" />          			       			
+				</p:schedule>					
+			</h:form>
+			<p:dialog widgetVar="novaAgendaDialog" header="Nova Agenda" showEffect="clip" hideEffect="clip" resizable="false" appendTo="@(body)" modal="true">
+				<h:form id="formNovaAgendaDialog">
+					<h:panelGrid id="novaAgendaDetails1" columns="3">
+						<p:outputLabel value="Data" />			         		        				           	 
+			            <p:outputLabel for="hInicio" value="Hora início" />
+			            <p:outputLabel for="hFinal" value="Hora final" />
+			            <p:inputText value="#{agendaMB.dataSelecionada}" readonly="true">
+			            	<f:convertDateTime pattern="dd/MM/yyyy"/>
+			           </p:inputText>	
+			            <p:calendar id="hInicio" value="#{agendaMB.dataHoraIni}" timeZone="America/Sao_Paulo" locale="pt_BR" timeOnly="true" pattern="HH:mm" minHour="9" maxHour="19" maxMinute="30"/>			            
+			            <p:calendar id="hFinal" value="#{agendaMB.dataHoraFim}" timeZone="America/Sao_Paulo" locale="pt_BR" timeOnly="true" pattern="HH:mm" minHour="9" maxHour="19" maxMinute="30"/>	
+			        </h:panelGrid>
+			        <h:panelGrid id="novaAgendaDetails2" columns="1">
+						<p:outputLabel for="cliente" value="Cliente" />						
+			            <p:autoComplete value="#{agendaMB.cliente}" completeMethod="#{agendaMB.pesquisarCliente}" converter="clienteConverter"
+			        	var="cliente" itemValue="#{cliente}" itemLabel="#{cliente.nome} #{cliente.telefone}" dropdown="true" forceSelection="true" minQueryLength="2" id="cliente"/>			        
+			        </h:panelGrid>
+			        <h:panelGrid id="novaAgendaDetails3" columns="1">			            
+			        	<p:outputLabel for="servicoList" value="Serviço" />
+			        	<p:pickList id="servicoList" value="#{agendaMB.dualServicos}" var="servicos" itemLabel="#{servicos}" itemValue="#{servicos}"
+			        			showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="servicoConverter">
+			        		<f:facet name="sourceCaption">Disponíveis</f:facet>
+        					<f:facet name="targetCaption">Selecionados</f:facet>
+			        	</p:pickList>			           
+			        </h:panelGrid>
+			         <h:panelGrid columns="7" rendered="#{agendaMB.editarAgenda}">	  	
+			            <p:commandButton value="Enviar" actionListener="#{agendaMB.addEvent}" update=":messages" oncomplete="PF('myschedule').update();PF('novaAgendaDialog').hide();" />
+			            <p:outputLabel value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+			            <p:outputLabel value="Encaixar"/>
+			            <p:selectBooleanCheckbox value="#{agendaMB.encaixarCliente}"/>
+			            <p:outputLabel value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+			            <p:outputLabel value="Não criar comanda"/>
+			            <p:selectBooleanCheckbox value="#{agendaMB.fecharAgenda}"/>
+			        </h:panelGrid>
+		        </h:form>	
+		    </p:dialog>	
+			<p:dialog widgetVar="editarAgendaDialog" header="Editar Agenda" showEffect="clip" hideEffect="clip" resizable="false" appendTo="@(body)" modal="true">
+				<h:form id="formEditarAgendaDialog">
+					<h:panelGrid id="editarAgendaDetails1" columns="3">
+						<p:outputLabel value="Data" />			         		        				           	 
+			            <p:outputLabel for="hInicio" value="Hora início" />
+			            <p:outputLabel for="hFinal" value="Hora final" />
+			            <p:inputText value="#{agendaMB.dataSelecionada}" readonly="true">
+			            	<f:convertDateTime pattern="dd/MM/yyyy"/>
+			           </p:inputText>	
+			            <p:calendar id="hInicio" value="#{agendaMB.dataHoraIni}" timeZone="America/Sao_Paulo" locale="pt_BR" timeOnly="true" pattern="HH:mm" minHour="9" maxHour="19" maxMinute="30"/>			            
+			            <p:calendar id="hFinal" value="#{agendaMB.dataHoraFim}" timeZone="America/Sao_Paulo" locale="pt_BR" timeOnly="true" pattern="HH:mm" minHour="9" maxHour="19" maxMinute="30"/>	
+			        </h:panelGrid>
+			        <h:panelGrid id="novaAgendaDetails2" columns="1">
+						<p:outputLabel for="cliente" value="Cliente" />						
+			            <p:autoComplete value="#{agendaMB.clienteEditar}" completeMethod="#{agendaMB.pesquisarCliente}" converter="clienteConverter"
+			        	var="cliente" itemValue="#{cliente}" itemLabel="#{cliente.nome} #{cliente.telefone}" dropdown="true" forceSelection="true" 
+			        	minQueryLength="2" id="cliente" disabled="#{agendaMB.editarBlockCliente}"/>	
+			        </h:panelGrid>
+			        <h:panelGrid id="novaAgendaDetails3" columns="1">			            
+			        	<p:outputLabel for="servicoList" value="Serviço" />
+			        	<p:pickList id="servicoList" value="#{agendaMB.dualServicos}" var="servicos" itemLabel="#{servicos}" itemValue="#{servicos}"
+			        			showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="servicoConverter">
+			        		<f:facet name="sourceCaption">Disponíveis</f:facet>
+        					<f:facet name="targetCaption">Selecionados</f:facet>
+			        	</p:pickList>			    
+			        </h:panelGrid>
+		          <h:panelGrid columns="3" rendered="#{agendaMB.editarAgenda}">	  	
+		             <p:commandButton value="Enviar" actionListener="#{agendaMB.atualizarEvent}" update=":formSchedule, :messages" oncomplete="PF('myschedule').update();PF('editarAgendaDialog').hide();" />
+		             <p:outputLabel value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+		             <p:commandButton icon="fa fa-close" value="Excluir" actionListener="#{agendaMB.excluir()}" update=":formSchedule, :messages" oncomplete="PF('myschedule').update();PF('editarAgendaDialog').hide();" />
+		          </h:panelGrid>
+		        </h:form>
+		    </p:dialog>		
+		</ui:define>
+	</ui:composition>
+</h:body>
+</html>

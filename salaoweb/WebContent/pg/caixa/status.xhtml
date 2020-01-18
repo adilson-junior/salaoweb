@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:composition template="/WEB-INF/template/principal.xhtml">	
+		<ui:define name="conteudo-esquerdo">			
+			<h:form id="formOperacao">
+				<p:panel header="Status">
+					<h:panelGrid>
+						<p:outputLabel value="#{caixaMB.statusCaixa}"/>
+						<p:outputLabel value="#{caixaMB.usuarioAbertura}"/>
+					</h:panelGrid>				
+				</p:panel>				
+				<p:spacer height="10"/>
+				<p:panel header="Operação">
+					<h:panelGrid>
+						<p:commandButton value="Abrir o Caixa" onclick="PF('abrirCaixaDialog').show()" update="formabrirCaixa" rendered="#{caixaMB.exibirAbrirCaixa}"/>
+						<p:commandButton value="Fechar o Caixa"  onclick="PF('fecharCaixaDialog').show()" rendered="#{caixaMB.exibirFecharCaixa}"/>					
+						<p:commandButton value="Fechar o Caixa Pendente" actionListener="#{caixaMB.fechar()}" rendered="#{caixaMB.exibirFecharCaixaPendente}" update="formOperacao"/>
+					</h:panelGrid>				
+				</p:panel>
+			</h:form>
+		</ui:define>	
+		<ui:define name="conteudo">		
+			<div class="conteudo-cadastros">	
+				<h2 style="margin:0;">Caixa</h2>
+				<p:separator style="width:980px; float:left; height:10px;"/>					
+				<p:spacer height="10"/>			
+				<p:messages id="messages" showDetail="true" autoUpdate="false" showSummary="false"/>	
+			</div>
+			<p:dialog widgetVar="abrirCaixaDialog" header="Abrir o Caixa" showEffect="clip" hideEffect="clip" resizable="false" appendTo="@(body)" modal="true">
+				<h:form id="formabrirCaixa">					
+			        <h:panelGrid columns="2" cellspacing="8">
+						<p:outputLabel for="valor" value="Fundo de Troco" />		
+						<p:inputNumber value="#{caixaMB.valorAberturaCaixa}" size="15" decimalSeparator="." symbolPosition="s" decimalPlaces="2" autocomplete="off" id="valor" required="true" requiredMessage="O fundo de troco deve ser informado"/>					
+			           	<p:commandButton value="Abrir" actionListener="#{caixaMB.abrir()}" oncomplete="PF('abrirCaixaDialog').hide()" update=":messages, :formOperacao" icon="fa fa-check"/>
+			           	<p:commandButton value="Cancelar" onclick="PF('abrirCaixaDialog').hide()" icon="fa fa-close"/>	  		        
+			        </h:panelGrid>	  
+		        </h:form>	
+		    </p:dialog>	
+	      <p:confirmDialog message="Após o fechamento sua sessão será finalizada. Deseja continuar?" header="Fechar o Caixa" widgetVar="fecharCaixaDialog" appendTo="@(body)" modal="true">
+		       <p:commandButton value="Sim" actionListener="#{caixaMB.fecharESair()}" oncomplete="PF('fecharCaixaDialog').hide()" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>
+		       <p:commandButton value="Não" type="button" onclick="PF('fecharCaixaDialog').hide()" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+		  </p:confirmDialog>
+		</ui:define>
+	</ui:composition>
+</html>

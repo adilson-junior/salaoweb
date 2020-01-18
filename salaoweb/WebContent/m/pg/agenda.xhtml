@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pm="http://primefaces.org/mobile">
+
+<f:view renderKitId="PRIMEFACES_MOBILE" />
+
+<h:head>
+<script type="text/javascript">
+PrimeFaces.locales['pt_BR'] = {
+ closeText: 'Fechar',
+ prevText: 'Anterior',
+ nextText: 'Próximo',
+ currentText: 'Começo',
+ monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+ monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun', 'Jul','Ago','Set','Out','Nov','Dez'],
+ dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+ dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+ dayNamesMin: ['D','S','T','Q','Q','S','S'],
+ weekHeader: 'Semana',
+ firstDay: 1,
+ isRTL: false,
+ showMonthAfterYear: false,
+ yearSuffix: '',
+ timeOnlyTitle: 'Só Horas',
+ timeText: 'Tempo',
+ hourText: 'Hora',
+ minuteText: 'Minuto',
+ secondText: 'Segundo',
+ currentText: 'Data Atual',
+ ampm: false,
+ month: 'Mês',
+ week: 'Semana',
+ day: 'Dia',
+ allDayText : 'Todo Dia'
+   };
+</script>
+<title>Salão</title>
+</h:head>
+
+<h:body>
+
+	<pm:page id="agenda">
+		<pm:header fixed="true">
+			<p:tabMenu activeIndex="1">
+				<p:menuitem value="Início" icon="ui-icon-home" url="/m/pg/index.jsf" iconPos="top"/>
+				<p:menuitem value="Agenda" icon="ui-icon-calendar" url="/m/pg/agenda.jsf" iconPos="top"/>
+				<p:menuitem value="Financeiro" icon="ui-icon-grid" url="/m/pg/financeiro.jsf" iconPos="top"/>			
+			</p:tabMenu>
+		</pm:header>			
+		
+		<pm:content>
+			<h:form id="formAgendas">
+				<p:calendar placeholder="Selecione uma data" value="#{magendaMB.dataSelecionada}">
+					<p:ajax event="dateSelect" listener="#{magendaMB.carregarDataSelecionada()}" update="listaAgendas" />
+				</p:calendar>
+				<p:dataTable var="agenda" value="#{magendaMB.agendas}" reflow="true" id="listaAgendas" style="padding:0px;">				    		    	
+					<p:column headerText="Cliente">
+						<h:outputText value="#{agenda.cliente.nome}" />
+					</p:column>			
+					<p:column headerText="Telefone">
+						<h:outputText value="#{agenda.cliente.celular}" />
+					</p:column>		
+					<p:column headerText="Hora">
+						<h:outputText value="#{agenda.horaDe}">
+							<f:convertDateTime pattern="HH:mm"/>
+						</h:outputText>
+					</p:column>	
+					<p:column headerText="Detalhes">
+						<p:commandLink value="Serviços" action="#{magendaMB.exibirDetalhes()}" update=":servicos">
+							<f:setPropertyActionListener value="#{agenda}" target="#{magendaMB.agendaSelecionada}"/>
+						</p:commandLink>
+					</p:column>
+				</p:dataTable>				
+			</h:form>		
+		</pm:content>
+
+		<pm:footer title="Salão Web" fixed="true"/>
+	</pm:page>
+	
+	<pm:page id="servicos">
+		<pm:header fixed="true" title="Serviços">
+			<p:button value="&nbsp;" outcome="pm:agenda" icon="ui-icon-arrow-l"/>
+		</pm:header>	
+			
+		<pm:content>
+			<h:form>
+				<p>					
+				<h:outputText value="#{magendaMB.agendaSelecionada.cliente.nome}" style="font-weight: bold;"/>	
+				</p>						
+				<h:outputText value="Telefone: "/>
+				<h:outputText value="#{magendaMB.agendaSelecionada.cliente.celular}"/>			
+				<p>
+				<h:outputText value="Horário: "/>
+				<h:outputText value="#{magendaMB.agendaSelecionada.horaDe}">
+							<f:convertDateTime pattern="HH:mm"/>
+				</h:outputText>	
+				</p>			
+				<h2>Serviços</h2>
+				<p:dataList var="servico" value="#{magendaMB.agendaSelecionada.servicos}">		
+					<p:outputLabel value="#{servico.nome}" />
+				</p:dataList>				
+			</h:form>
+		</pm:content>
+				
+		<pm:footer title="Salão Web" fixed="true"/>
+	</pm:page>
+
+</h:body>
+
+</html>

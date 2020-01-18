@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pm="http://primefaces.org/mobile">
+
+<f:view renderKitId="PRIMEFACES_MOBILE" />
+
+<h:head>
+<title>Salão</title>
+</h:head>
+
+<h:body>
+
+	<pm:page id="inicio">
+		<pm:header fixed="true" title="Erro!">
+			
+		</pm:header>	
+			
+		<pm:content>
+			<div style="margin: 0 auto; width: 32px; height: 32px;">
+				<p:graphicImage url="/img/erro.png"/>
+			</div>
+			<div style="margin: 0 auto; clear: both; text-align: center; margin-top: 5px;">
+				<h:outputText value="Houve um erro ao consultar os dados." />
+			</div>
+		</pm:content>
+
+		<pm:footer title="Salão Web" fixed="true"/>
+	</pm:page>
+
+</h:body>
+
+</html>

@@ -1,0 +1,19 @@
+@CHARSET "ISO-8859-1";
+
+html, body, div{
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+body {
+	font-size: 0.93em;	
+}
+
+.ui-widget, .ui-calendar, .ui-outputlabel{
+	font-size: 0.93em;		
+}
+
+label{
+	font-size: 0.93em;	
+}

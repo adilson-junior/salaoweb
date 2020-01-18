@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+<f:view contentType="text/html; charset=ISO-8859-1">
+
+<h:head>
+	<style type="text/css">
+		html, body, div{
+			margin: 0;
+			padding: 0;
+			border: 0;			
+			background: transparent;	
+		}
+		
+		body {		
+			font-size: 0.93em;
+			font-family: "Arial", sans-serif, Helvetica Neue, Helvetica;	
+			background: #691835;			
+		}
+		
+		#login{
+			width: 310px;
+			height: 210px;
+			margin: 0 auto;
+			margin-top: 50px;
+			clear: both;
+		}
+		
+		#logo{		
+			width: 300px;		
+			font-weight: bold;
+			font-size: 4em;
+			color: #fff000;
+			text-align: center;
+			margin: 0 auto;
+			margin-top: 50px;
+		}
+		
+		#titulo{
+			color: #ffffff;
+			font-weight: bold;
+			font-size: 2em;
+			margin-left: 18px;
+		}
+	</style>
+	<title>Salão Web</title>
+</h:head>
+
+<h:body>
+	<div id="logo">
+		Salão Web
+	</div>
+	<div id="login">		
+		<p:messages id="messages" showDetail="true" autoUpdate="false" showSummary="false"/>		
+		<p:panel header="Login" style="height: 200px; width: 300px; margin: 0 auto;">
+			<h:form id="formLogin">
+				<h:panelGrid columns="2" cellspacing="8">
+					<p:outputLabel value="Usuário" for="usuario"/>
+					<p:inputText id="usuario" value="#{loginMB.nome}" size="18" required="true" requiredMessage="Usuário deve ser informado"/>	
+					<p:outputLabel value="Senha" for="senha"/>
+					<p:password id="senha" value="#{loginMB.senha}" size="18" required="true" requiredMessage="Senha deve ser informado"/>					
+					<p:commandButton value="Enviar" ajax="false" actionListener="#{loginMB.validar()}" update="formLogin, :messages"/>		
+				</h:panelGrid>
+			</h:form>
+		</p:panel>
+	</div>
+
+</h:body>
+
+
+</f:view>
+</html>

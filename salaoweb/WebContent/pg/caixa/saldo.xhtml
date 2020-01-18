@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:composition template="/WEB-INF/template/principal.xhtml">		
+		<ui:define name="conteudo-esquerdo">
+			<h:form id="formOperacao">
+				<p:panel header="Status">
+					<h:panelGrid>
+						<p:outputLabel value="#{caixaMB.statusCaixa}"/>
+						<p:outputLabel value="#{caixaMB.usuarioAbertura}"/>
+					</h:panelGrid>				
+				</p:panel>				
+				<p:spacer height="10"/>
+				<p:panel header="Operação">
+					<h:panelGrid>						
+						<p:commandButton value="Fechar o Caixa" onclick="PF('fecharCaixaDialog').show()" rendered="#{caixaMB.exibirFecharCaixa}"/>						
+					</h:panelGrid>				
+				</p:panel>
+			</h:form>					
+		</ui:define>	
+		<ui:define name="conteudo">		
+			<div class="conteudo-cadastros">					
+				<h2 style="margin:0;"><span style="color: #848484;">Caixa &gt; </span> Saldo</h2>	
+				<p:separator style="width:980px; float:left; height:10px;"/>					
+				<p:spacer height="10"/>			
+				<p:messages id="messages" showDetail="true" autoUpdate="false" showSummary="false"/>
+				<p:tabView>
+					<p:tab title="Resumo">	
+						<h:panelGrid columns="4">
+							<p:panel header="Venda" style="height: 170px;">
+								<h:panelGrid columns="2" cellspacing="10">
+									<p:outputLabel value="Valor" style="font-weight: bold;"/>
+									<p:outputLabel value="#{caixaMB.totalVenda}">
+										<f:convertNumber type="currency" />
+									</p:outputLabel>
+									<p:outputLabel value="Desconto" style="font-weight: bold;"/>
+									<p:outputLabel value="#{caixaMB.totalDesconto}">
+										<f:convertNumber type="currency" />
+									</p:outputLabel>																
+								</h:panelGrid>															
+							</p:panel>	
+							<p:panel header="Entrada (Pagamento)" style="height: 170px;">
+								<h:panelGrid columns="2" cellspacing="10">
+									<p:outputLabel value="Dinheiro" style="font-weight: bold;"/>
+									<p:outputLabel value="#{caixaMB.totalDinheiro}">
+										<f:convertNumber type="currency" />
+									</p:outputLabel>
+									<p:outputLabel value="C. de Débito" style="font-weight: bold;"/>
+									<p:outputLabel value="#{caixaMB.totalDebito}">
+										<f:convertNumber type="currency" />
+									</p:outputLabel>
+									<p:outputLabel value="C. de Crédito" style="font-weight: bold;"/>
+									<p:outputLabel value="#{caixaMB.totalCredito}">
+										<f:convertNumber type="currency" />
+									</p:outputLabel>
+									<p:outputLabel value="Cheque" style="font-weight: bold;"/>
+									<p:outputLabel value="#{caixaMB.totalCheque}">
+										<f:convertNumber type="currency" />
+									</p:outputLabel>																
+								</h:panelGrid>								
+							</p:panel>
+							<p:panel header="Entrada (Outros)" style="height: 170px;">
+								<h:panelGrid columns="2" cellspacing="10">									
+									<p:outputLabel value="Fundo de Troco" style="font-weight: bold;"/>
+									<p:outputLabel value="#{caixaMB.fundoTroco}">
+										<f:convertNumber type="currency" />
+									</p:outputLabel>
+									<p:outputLabel value="Reforço" style="font-weight: bold;"/>
+									<p:outputLabel value="#{caixaMB.totalReforco}">
+										<f:convertNumber type="currency" />
+									</p:outputLabel>											
+								</h:panelGrid>								
+							</p:panel>
+							<p:panel header="Saída" style="height: 170px;">
+								<h:panelGrid columns="2" cellspacing="10">						
+									<p:outputLabel value="Sangria" style="font-weight: bold;"/>
+									<p:outputLabel value="#{caixaMB.totalSangria}">
+									 	<f:convertNumber type="currency" />
+									 </p:outputLabel>															
+								</h:panelGrid>
+							</p:panel>
+							<p:panel><!-- Venda -->
+								<h:panelGrid columns="2" cellspacing="10">
+									<p:outputLabel value="Total&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" style="font-weight: bold;"/>
+									<p:outputLabel value="#{caixaMB.totalVenda - caixaMB.totalDesconto}">
+										<f:convertNumber type="currency" />
+									</p:outputLabel>
+								</h:panelGrid>
+							</p:panel>		
+							<p:panel><!-- Entrada (Pagamento) -->
+								<h:panelGrid columns="2" cellspacing="10">
+									<p:outputLabel value="Total&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" style="font-weight: bold;"/>
+									<p:outputLabel value="#{caixaMB.totalEntradaPagamento}">
+										<f:convertNumber type="currency" />
+									</p:outputLabel>
+								</h:panelGrid>
+							</p:panel>	
+							<p:panel><!-- Entrada (Outros) -->
+								<h:panelGrid columns="2" cellspacing="10">
+									<p:outputLabel value="Total&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" style="font-weight: bold;"/>
+									<p:outputLabel value="#{caixaMB.totalEntradaOutros}">
+										<f:convertNumber type="currency" />
+									</p:outputLabel>
+								</h:panelGrid>
+							</p:panel>		
+							<p:panel><!-- Saída -->
+								<h:panelGrid columns="2" cellspacing="10">
+									<p:outputLabel value="Total&nbsp;&nbsp;&nbsp;&nbsp;" style="font-weight: bold;"/>
+									<p:outputLabel value="#{caixaMB.totalSaida}">
+										<f:convertNumber type="currency" />
+									</p:outputLabel>
+								</h:panelGrid>
+							</p:panel>								
+						</h:panelGrid>						
+					</p:tab>									
+				</p:tabView>
+				<p:spacer height="10"/>
+				<h:panelGrid columns="2" cellspacing="10">
+					<p:outputLabel value="Saldo" style="font-weight: bold;"/>
+					<p:outputLabel value="#{caixaMB.saldo}">
+						<f:convertNumber type="currency" />
+					</p:outputLabel>
+				</h:panelGrid>	
+			</div>	
+		   <p:confirmDialog message="Após o fechamento sua sessão será finalizada. Deseja continuar?" header="Fechar o Caixa" widgetVar="fecharCaixaDialog" appendTo="@(body)" modal="true">
+		       <p:commandButton value="Sim" actionListener="#{caixaMB.fecharESair()}" oncomplete="PF('fecharCaixaDialog').hide()" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>
+		       <p:commandButton value="Não" type="button" onclick="PF('fecharCaixaDialog').hide()" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+		   </p:confirmDialog>		
+		</ui:define>
+	</ui:composition>
+</html>

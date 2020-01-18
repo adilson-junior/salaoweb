@@ -1,0 +1,126 @@
+@CHARSET "ISO-8859-1";
+
+html, body, div{
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;	
+}
+
+body {
+	font-size: 0.93em;			
+	background: #ffffff;
+}
+
+.ui-widget {
+	font-size: 0.93em;		
+}
+
+.ui-widget-content-layout{	
+	border: 0px !important;
+	background: #ffffff !important;
+}
+
+.ui-layout-unit-content{	
+	background: #ffffff !important;	;
+	overflow: visible;
+}
+
+.ui-layout-north {
+   z-index: 100 !important;
+   overflow: visible;
+}
+
+.ui-layout-north .ui-layout-unit-content {
+   overflow: visible;
+}
+
+.ui-layout-north, .ui-layout-west {
+	padding: 10px !important;
+}
+
+.ui-widget-overlay {
+    opacity: 0.1 !important;
+}
+
+img {
+	max-width: 100%;	
+}
+
+.header {
+	min-height: 60px;
+	position: fixed;
+	top: 0;
+	right: 0;
+	left: 0;
+	z-index: 2;
+}
+
+#logo{
+	float: left;
+	margin-top: 10px;
+	margin-left: 15px;	
+}
+
+#login{
+	float: right;
+	margin-top: 33px;
+	margin-right: 15px;
+	color: #ffffff;
+	font-weight: bold;
+}
+
+#login a{
+	color: #ffffff;
+	text-decoration: none;
+}
+
+#login a:hover{
+	color: #e9ebee;
+	text-decoration: underline;
+}
+
+.titulo{
+	float: left;
+	color: #ffffff;
+	font-weight: bold;
+	font-size: 2em;
+	margin-left: 18px;
+	margin-top: 21px;
+}
+
+.nav{
+	width: 100%;	
+	position: relative;
+}
+
+.ui-nav-esq{
+	padding-left: 1em;
+}
+
+.conteudo-cadastros{
+	max-width: 980px;
+	padding-top: 9px;
+}
+
+.conteudo{
+	width: 100%;
+	margin: 0 auto;	
+	position: relative;		
+}
+
+.event-agenda-dia-passado{
+	background: #E9967A !important;
+	border-color: #E9967A !important;
+}
+
+.event-agenda-encaixe{
+	background: #FFD700 !important;
+	border-color: #FFD700 !important;
+	color: #000000 !important;
+}
+
+.event-agenda-dia-hora-passado{
+	background: #FFA500 !important;
+	border-color: #FFA500 !important;
+}

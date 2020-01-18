@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:composition template="/WEB-INF/template/principal.xhtml">			
+		<ui:define name="conteudo">		
+			<div class="conteudo-cadastros">					
+				<h2 style="margin:0;"><span style="color: #848484;">Caixa &gt; </span> Extrato</h2>	
+				<p:separator style="width:980px; float:left; height:10px;"/>					
+				<p:spacer height="10"/>			
+				<p:messages id="messages" showDetail="true" autoUpdate="false" showSummary="false"/>
+				<p:tabView>
+					<p:tab title="Venda">
+						<p:dataTable id="listaComandas" var="extrato" value="#{extratoMB.extratos}" scrollable="true" scrollHeight="350"> 				           
+					        <p:columnGroup type="header">
+					       		<p:row>
+					       			<p:column rowspan="2" headerText="Data"/>
+					       			<p:column rowspan="2" headerText="Cliente" width="200"/>
+					       			<p:column colspan="3" headerText="Total da Comanda"/>
+					       			<p:column colspan="4" headerText="Forma de Pagamento"/>
+					       		</p:row>
+					       		<p:row>
+					       			<p:column headerText="Valor"/>
+					       			<p:column headerText="Desconto"/>
+					       			<p:column headerText="Total"/>
+					       			<p:column headerText="Dinheiro"/>
+					       			<p:column headerText="C. Crédito"/>
+					       			<p:column headerText="C. Débito"/>
+					       			<p:column headerText="Cheque"/>
+					       		</p:row>
+					        </p:columnGroup>		  
+					     	<p:column> 			             
+				       		 	<h:outputText value="#{extrato.data}">
+				       		 		<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+				       		 	</h:outputText>  
+				        	</p:column>	
+					        <p:column> 			             
+				       		 	<h:outputText value="#{extrato.cliente}"/>  
+				        	</p:column>	
+				        	<p:column style="text-align: right !important;"> 			             
+				       		 	<h:outputText value="#{extrato.valorTotalComanda}">
+				       		 		<f:convertNumber type="currency" currencySymbol=""/>
+				       		 	</h:outputText>  
+				        	</p:column> 				       				    
+				        	<p:column style="text-align: right !important;"> 			             
+				       		 	<h:outputText value="#{extrato.descontoTotalComanda}" style="color: #FF0000;">
+				       		 		<f:convertNumber type="currency" currencySymbol=""/>
+				       		 	</h:outputText>    
+				        	</p:column> 				           
+				        	<p:column style="text-align: right !important;"> 			             
+				       		 	<h:outputText value="#{extrato.total}">
+				       		 		<f:convertNumber type="currency" currencySymbol=""/>
+				       		 	</h:outputText>    
+				        	</p:column>
+				        	<p:column style="text-align: right !important;"> 			             
+				       		 	<h:outputText value="#{extrato.pagamentoDinheiro}">
+				       		 		<f:convertNumber type="currency" currencySymbol=""/>
+				       		 	</h:outputText>    
+				        	</p:column>
+				        	<p:column style="text-align: right !important;"> 			             
+				       		 	<h:outputText value="#{extrato.pagamentoCredito}">
+				       		 		<f:convertNumber type="currency" currencySymbol=""/>
+				       		 	</h:outputText>   
+				        	</p:column>
+				        	<p:column style="text-align: right !important;"> 			             
+				       		 	<h:outputText value="#{extrato.pagamentoDebito}">
+				       		 		<f:convertNumber type="currency" currencySymbol=""/>
+				       		 	</h:outputText>   
+				        	</p:column>
+				        	<p:column style="text-align: right !important;"> 			             
+				       		 	<h:outputText value="#{extrato.pagamentoCheque}">
+				       		 		<f:convertNumber type="currency" currencySymbol=""/>
+				       		 	</h:outputText>    
+				        	</p:column>	
+				        				        	
+				        </p:dataTable>
+				        <p:dataTable emptyMessage="">    
+				        	<p:column headerText=""/>
+			             	<p:column headerText="" width="200"/>
+			                <p:column headerText="#{extratoMB.totalValor}" style="text-align: right !important;"/>					 
+			                <p:column headerText="#{extratoMB.totalDesconto}" style="text-align: right !important;"/>	
+			                <p:column headerText="#{extratoMB.totalComanda}" style="text-align: right !important;"/>	
+			                <p:column headerText="#{extratoMB.totalDinheiro}" style="text-align: right !important;"/>	
+			                <p:column headerText="#{extratoMB.totalCredito}" style="text-align: right !important;"/>	
+			                <p:column headerText="#{extratoMB.totalDebito}" style="text-align: right !important;"/>	
+			                <p:column headerText="#{extratoMB.totalCheque}" width="#{extratoMB.largura}" style="text-align: right !important;"/>
+				        </p:dataTable>
+					</p:tab>
+					<p:tab title="Reforço">
+						<p:dataTable id="listaReforcos" var="reforco" value="#{extratoMB.reforcos}" scrollable="true" scrollHeight="350" style="width: 500px;">  
+					     	<p:column headerText="Id" footerText=""> 			             
+				       		 	<h:outputText value="#{reforco.id}"/>
+				        	</p:column>	
+					     	<p:column headerText="Data" footerText=""> 			             
+				       		 	<h:outputText value="#{reforco.data}">
+				       		 		<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+				       		 	</h:outputText>  
+				        	</p:column>	
+					        <p:column headerText="Valor" style="text-align: right !important;"> 			             
+				       		 	<h:outputText value="#{reforco.valor}" style="text-align: center;">
+				       		 		<f:convertNumber type="currency" currencySymbol=""/>
+				       		 	</h:outputText>      
+				        	</p:column>	
+				        	<p:columnGroup type="footer">
+					            <p:row>           				            
+					                <p:column colspan="5" style="text-align:right" footerText="Total: #{extratoMB.totalReforco}"/>
+					            </p:row>
+					        </p:columnGroup>			        	
+				        </p:dataTable>
+					</p:tab>
+					<p:tab title="Sangria">
+						<p:dataTable id="listaSangrias" var="sangria" value="#{extratoMB.sangrias}" scrollable="true" scrollHeight="350">  
+					     	<p:column headerText="Id" footerText=""> 			             
+				       		 	<h:outputText value="#{sangria.id}"/>
+				        	</p:column>	
+					     	<p:column headerText="Data" footerText=""> 			             
+				       		 	<h:outputText value="#{sangria.data}">
+				       		 		<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+				       		 	</h:outputText>  
+				        	</p:column>	
+				        	<p:column headerText="Motivo" footerText=""> 			             
+					       		 	<h:outputText value="#{sangria.motivo}"/>
+					        	</p:column>
+					        <p:column headerText="Valor" style="text-align: right !important;"> 			             
+				       		 	<h:outputText value="#{sangria.valor}" style="text-align: center;">
+				       		 		<f:convertNumber type="currency" currencySymbol=""/>
+				       		 	</h:outputText>      
+				        	</p:column>	
+				        	<p:columnGroup type="footer">
+					            <p:row>           				            
+					                <p:column colspan="5" style="text-align:right" footerText="Total: #{extratoMB.totalSangria}"/>
+					            </p:row>
+					        </p:columnGroup>				        			        	
+				        </p:dataTable>
+					</p:tab>					
+				</p:tabView>				
+			</div>			
+		</ui:define>
+	</ui:composition>
+</html>

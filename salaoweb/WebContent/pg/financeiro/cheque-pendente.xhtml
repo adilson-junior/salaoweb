@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:composition template="/WEB-INF/template/principal.xhtml">
+		<ui:define name="head">
+			<link type="text/css" rel="stylesheet" href="#{request.contextPath}/css/postagem.css" />
+			<script type="">
+				PrimeFaces.locales['pt_BR'] = {
+                closeText: 'Fechar',
+                prevText: 'Anterior',
+                nextText: 'Próximo',
+                currentText: 'Começo',
+                monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+                monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun', 'Jul','Ago','Set','Out','Nov','Dez'],
+                dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+                dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+                dayNamesMin: ['D','S','T','Q','Q','S','S'],
+                weekHeader: 'Semana',
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: '',
+                timeOnlyTitle: 'Só Horas',
+                timeText: 'Tempo',
+                hourText: 'Hora',
+                minuteText: 'Minuto',
+                secondText: 'Segundo',
+                currentText: 'Data Atual',
+                ampm: false,
+                month: 'Mês',
+                week: 'Semana',
+                day: 'Dia',
+                allDayText : 'Todo Dia'
+            };
+			</script>
+		</ui:define>	
+		<ui:define name="conteudo-esquerdo">			
+			<p:panel>
+				<h:form id="formEventos">
+					<h:panelGrid columns="1">
+						<p:outputLabel value="Data Inicial"/>
+						<p:calendar value="#{chequeMB.dataInicio}" locale="pt_BR" navigator="true" pattern="dd/MM/yyyy" yearRange="c-5:c+5" 
+								required="true" requiredMessage="Data de Nascimento deve ser informado" disabled="#{chequeMB.bloquearCalendario}" id="dtInicio"/>
+						<p:outputLabel value="Data Final"/>
+						<p:calendar value="#{chequeMB.dataFinal}" locale="pt_BR" navigator="true" pattern="dd/MM/yyyy" yearRange="c-5:c+5" 
+								required="true" requiredMessage="Data de Nascimento deve ser informado" disabled="#{chequeMB.bloquearCalendario}" id="dtFinal"/>						
+				        <p:outputLabel></p:outputLabel>	
+					</h:panelGrid>	
+					<h:panelGrid columns="2">
+				        <h:outputText value="Pendente" />    
+				        <p:selectBooleanCheckbox value="#{chequeMB.exibirChequesPendentes}">
+				            <p:ajax update="dtInicio, dtFinal" listener="#{chequeMB.bloquearDesbloquear()}" />
+				        </p:selectBooleanCheckbox>
+				        <p:outputLabel></p:outputLabel>	
+				        <p:outputLabel></p:outputLabel>	
+				        <p:commandButton value="Atualizar" actionListener="#{chequeMB.listarCheques()}" icon="fa fa-refresh" update=":formTabs, :messages"/>
+				    </h:panelGrid>			
+				</h:form>			
+			</p:panel>			
+		</ui:define>	
+		<ui:define name="conteudo">		
+			<div class="conteudo-cadastros">			
+				<h2 style="margin:0;"><span style="color: #848484;">Financeiro &gt; </span> Cheques Pendentes</h2>	
+				<p:separator style="width:980px; float:left; height:10px;"/>					
+				<p:spacer height="10"/>			
+				<p:messages id="messages" showDetail="true" autoUpdate="false" showSummary="false"/>
+				<h:form id="formTabs">
+					<p:tabView id="tableCheques">
+						<p:tab title="Cheques">
+							<p:dataTable id="listaCheques" var="cheque" value="#{chequeMB.cheques}" scrollable="true" scrollHeight="400" rendered="#{!chequeMB.bloquearCalendario}">       
+						     	<p:column headerText="Data" width="75"> 			             
+					       		 	<h:outputText value="#{cheque.data}">
+					       		 		<f:convertDateTime pattern="dd/MM/yyyy"/>
+					       		 	</h:outputText>  
+					        	</p:column>
+					        	<p:column headerText="Pagamento" width="75"> 			             
+					       		 	<h:outputText value="#{cheque.dataPagamento}">
+					       		 		<f:convertDateTime pattern="dd/MM/yyyy"/>
+					       		 	</h:outputText>    
+					        	</p:column> 	
+						        <p:column headerText="Cliente"> 			             
+					       		 	<h:outputText value="#{cheque.cliente}"/>  
+					        	</p:column>					        	
+					        	<p:column headerText="Valor" width="75" style="text-align: right !important;"> 			             
+					       		 	<h:outputText value="#{cheque.valor}">
+					       		 		<f:convertNumber type="currency" currencySymbol=""/>
+					       		 	</h:outputText>  
+					        	</p:column> 
+					        	<p:column headerText="Banco"> 			             
+					       		 	<h:outputText value="#{cheque.banco}"/>
+					        	</p:column>					        					        	    	
+					        	<p:columnGroup type="footer">
+						            <p:row>           				            
+						                <p:column colspan="10" style="text-align:right" footerText="Total: #{chequeMB.total}"/>
+						            </p:row>
+						        </p:columnGroup>			        	
+					        </p:dataTable>
+					        <p:dataTable id="listaCheques2" var="cheque" value="#{chequeMB.cheques}" scrollable="true" scrollHeight="350" rendered="#{chequeMB.bloquearCalendario}">       
+						     	<p:column headerText="Data" width="75"> 			             
+					       		 	<h:outputText value="#{cheque.data}">
+					       		 		<f:convertDateTime pattern="dd/MM/yyyy"/>
+					       		 	</h:outputText>  
+					        	</p:column>					        	
+						        <p:column headerText="Cliente"> 			             
+					       		 	<h:outputText value="#{cheque.cliente}"/>  
+					        	</p:column>					        	
+					        	<p:column headerText="Valor" width="75"> 			             
+					       		 	<h:outputText value="#{cheque.valor}">
+					       		 		<f:convertNumber type="currency" currencySymbol=""/>
+					       		 	</h:outputText>  
+					        	</p:column> 
+					        	<p:column headerText="Banco"> 			             
+					       		 	<h:outputText value="#{cheque.banco}"/>
+					        	</p:column>        	
+					        	<p:column headerText="Resolver" width="80" style="text-align: center;"> 
+						        	<p:commandButton icon="fa fa-edit" title="Resolver Cheque" onclick="PF('confirmarDialog').show()" update=":formDadosCheque">
+						        		<f:setPropertyActionListener target="#{chequeMB.cheque}" value="#{cheque}"/>
+						        	</p:commandButton>				            	        	 		            
+						        </p:column>>				        	    	
+					        	<p:columnGroup type="footer">
+						            <p:row>           				            
+						                <p:column colspan="10" style="text-align:right" footerText="Total: #{chequeMB.total}"/>
+						            </p:row>
+						        </p:columnGroup>			        	
+					        </p:dataTable>
+						</p:tab>					
+					</p:tabView>					
+				</h:form>				
+			</div>	    
+		     <p:confirmDialog message="Confirmar o pagamento do cheque selecionado?" header="Resolver Cheque" widgetVar="confirmarDialog" appendTo="@(body)" modal="true" id="cDialog">
+		        <h:form id="formDadosCheque">
+		        	<h:panelGrid columns="2" cellspacing="8">
+		        	<p:outputLabel value="Cliente"/>
+					<p:outputLabel value="#{chequeMB.cheque.cliente}"/>
+		        	<p:outputLabel value="Data"/>
+		        	<p:outputLabel value="#{chequeMB.cheque.data}">
+		        		<f:convertDateTime pattern="dd/MM/yyyy"/>
+		        	</p:outputLabel>
+		        	<p:outputLabel value="Banco"/>
+					<p:outputLabel value="#{chequeMB.cheque.banco}"/>
+					<p:outputLabel value="Valor"/>
+					<p:outputLabel value="#{chequeMB.cheque.valor}">
+						<f:convertNumber type="currency" />
+					</p:outputLabel>					
+		        </h:panelGrid>
+		        </h:form>
+		        <p:commandButton value="Sim" actionListener="#{chequeMB.confirmarPagamento}" oncomplete="PF('confirmarDialog').hide()" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" update=":messages, :formTabs"/>
+		        <p:commandButton value="Não" type="button" onclick="PF('confirmarDialog').hide()" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+		    </p:confirmDialog>
+		    		
+		</ui:define>
+	</ui:composition>
+</html>

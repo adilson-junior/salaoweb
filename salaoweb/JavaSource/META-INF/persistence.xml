@@ -1,0 +1,57 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence
+     http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+	version="2.0">
+
+	<persistence-unit name="salao_persistence">	
+
+		<class>br.com.salao.modelo.Agenda</class>
+		<class>br.com.salao.modelo.Bandeira</class>
+		<class>br.com.salao.modelo.Caixa</class>
+		<class>br.com.salao.modelo.Cartao</class>
+		<class>br.com.salao.modelo.Cheque</class>
+		<class>br.com.salao.modelo.Cliente</class>
+		<class>br.com.salao.modelo.Comanda</class>
+		<class>br.com.salao.modelo.Pessoa</class>
+		<class>br.com.salao.modelo.Profissional</class>
+		<class>br.com.salao.modelo.Reforco</class>
+		<class>br.com.salao.modelo.Pagamento</class>
+		<class>br.com.salao.modelo.Sangria</class>
+		<class>br.com.salao.modelo.Servico</class>
+		<class>br.com.salao.modelo.Usuario</class>
+		<class>br.com.salao.modelo.Vale</class>
+		<class>br.com.salao.modelo.Banco</class>
+		<class>br.com.salao.modelo.Categoria</class>
+		<class>br.com.salao.modelo.Produto</class>
+		<class>br.com.salao.modelo.Item</class>
+		<class>br.com.salao.modelo.ContaPag</class>
+
+		<properties>
+		
+<!-- 			<property name="hibernate.connection.url" value="jdbc:postgresql://localhost:5432/salaodb" /> -->
+<!-- 			<property name="hibernate.connection.username" value="salaodba" /> -->
+<!-- 			<property name="hibernate.connection.password" value="402540" /> -->
+<!-- 			<property name="hibernate.connection.driver_class" value="org.postgresql.Driver" /> -->
+<!-- 			<property name="hibernate.show_sql" value="false" /> -->
+<!-- 			<property name="hibernate.format_sql" value="true" /> -->
+<!-- 			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" /> -->
+
+			
+			<!-- Configuring Connection Pool -->
+			<property name="hibernate.temp.use_jdbc_metadata_defaults" value="false" />			
+			<property name="hibernate.show_sql" value="false" />
+			<property name="hibernate.format_sql" value="false" />
+			<property name="hibernate.c3p0.min_size" value="1" />
+			<property name="hibernate.c3p0.max_size" value="1" />
+			<property name="hibernate.c3p0.timeout" value="500" />
+			<property name="hibernate.c3p0.max_statements" value="10" />
+			<property name="hibernate.c3p0.idle_test_period" value="2000" />
+			<property name="hibernate.hbm2ddl.auto" value="update" />
+
+		</properties>
+	
+
+	</persistence-unit>
+
+</persistence>

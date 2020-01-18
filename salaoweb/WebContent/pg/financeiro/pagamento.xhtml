@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:composition template="/WEB-INF/template/principal.xhtml">		
+		<ui:define name="head">
+			<link type="text/css" rel="stylesheet" href="#{request.contextPath}/css/postagem.css" />
+			<script type="">
+				PrimeFaces.locales['pt_BR'] = {
+                closeText: 'Fechar',
+                prevText: 'Anterior',
+                nextText: 'Próximo',
+                currentText: 'Começo',
+                monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+                monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun', 'Jul','Ago','Set','Out','Nov','Dez'],
+                dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+                dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+                dayNamesMin: ['D','S','T','Q','Q','S','S'],
+                weekHeader: 'Semana',
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: '',
+                timeOnlyTitle: 'Só Horas',
+                timeText: 'Tempo',
+                hourText: 'Hora',
+                minuteText: 'Minuto',
+                secondText: 'Segundo',
+                currentText: 'Data Atual',
+                ampm: false,
+                month: 'Mês',
+                week: 'Semana',
+                day: 'Dia',
+                allDayText : 'Todo Dia'
+            };
+			</script>
+		</ui:define>
+		<ui:define name="conteudo-esquerdo">			
+			<p:panel header="Referência">
+				<h:form id="formEventos">
+					<h:panelGrid columns="1">
+						<p:outputLabel value="Data Inicial"/>
+						<p:calendar value="#{pagamentoMB.dataInicio}" locale="pt_BR" navigator="true" pattern="dd/MM/yyyy" yearRange="c-5:c+5" 
+								required="true" requiredMessage="Data deve ser informado"/>
+						<p:outputLabel value="Data Final"/>
+						<p:calendar value="#{pagamentoMB.dataFinal}" locale="pt_BR" navigator="true" pattern="dd/MM/yyyy" yearRange="c-5:c+5" 
+								required="true" requiredMessage="Data deve ser informado"/>						
+				        <p:outputLabel></p:outputLabel>		
+				        <p:commandButton value="Calcular" actionListener="#{pagamentoMB.calcularPagamentos()}" icon="fa fa-refresh" update=":formPagamentos, :messages"/>
+					</h:panelGrid>				
+				</h:form>			
+			</p:panel>		
+		</ui:define>	
+		<ui:define name="conteudo">		
+			<div class="conteudo-cadastros">	
+				<h2 style="margin:0;"><span style="color: #848484;">Financeiro &gt; </span> Pagamento</h2>
+				<p:separator style="width:980px; float:left; height:10px;"/>					
+				<p:spacer height="10"/>			
+				<p:messages id="messages" showDetail="true" autoUpdate="false" showSummary="false"/>
+				<h:form id="formPagamentos">
+					<p:dataTable id="listaPagamentos" var="pagamento" value="#{pagamentoMB.pagamentosVO}" selection="#{pagamentoMB.pagamentosSelecionadosVO}" rowKey="#{pagamento.idProfissional}" scrollable="true" scrollHeight="350">   
+				     	<p:column selectionMode="multiple" width="16" style="text-align:center"/>
+				     	<p:column headerText="Profissional"> 			             
+			       		 	<h:outputText value="#{pagamento.nomeProfissional}"/>
+			        	</p:column>	
+				        <p:column headerText="Vale" width="80" style="text-align: center;"> 			             
+			       		 	<h:outputText value="#{pagamento.vale}">
+			       		 		<f:convertNumber type="currency" currencySymbol=""/>
+			       		 	</h:outputText>  
+			        	</p:column>	
+			        	<p:column headerText="Outros" width="80" style="text-align: center;"> 			             
+			       		 	<h:outputText value="#{pagamento.outros}">
+			       		 		<f:convertNumber type="currency" currencySymbol=""/>
+			       		 	</h:outputText>  
+			        	</p:column> 				       				    
+			        	<p:column headerText="Ajuste" width="80" style="text-align: center;"> 			             
+			       		 	<h:outputText value="#{pagamento.ajuste}">
+			       		 		<f:convertNumber type="currency" currencySymbol=""/>
+			       		 	</h:outputText>    
+			        	</p:column> 				           
+			        	<p:column headerText="Comissão" width="80" style="text-align: center;"> 			             
+			       		 	<h:outputText value="#{pagamento.valor}" >
+			       		 		<f:convertNumber type="currency" currencySymbol=""/>
+			       		 	</h:outputText>    
+			        	</p:column>
+			        	<p:column headerText="Saldo" width="80" style="text-align: center; background:#F2F5A9;"> 			             
+			       		 	<h:outputText value="#{pagamento.total}" >
+			       		 		<f:convertNumber type="currency" currencySymbol=""/>
+			       		 	</h:outputText>    
+			        	</p:column>
+			        	<p:column headerText="Detalhes"  width="55" style="text-align: center;"> 			             
+			       		 	<p:commandButton icon="fa fa-list-alt" title="Detalhes (Vales e Outros)" action="#{pagamentoMB.selecionarDetalhesProfissional()}" 
+			       		 	oncomplete="PF('detalhesDialog').show()" update=":formDetalhesDialog,:messages">
+				        		<f:setPropertyActionListener target="#{pagamentoMB.pagamentoVO}" value="#{pagamento}"/>
+				        	</p:commandButton>		
+			        	</p:column>	
+			        	<p:column headerText="Ajustar Saldo"  width="55" style="text-align: center;"> 			             
+			       		 	<p:commandButton icon="fa fa-edit" title="Ajusta Saldo" onclick="PF('ajusteDialog').show()" update=":formAjusteDialog">
+				        		<f:setPropertyActionListener target="#{pagamentoMB.pagamentoVO}" value="#{pagamento}" />
+				        	</p:commandButton>		
+			        	</p:column>	
+			        	 <f:facet name="footer">
+			        	 	<p:commandButton value="Pagar Selecionados" actionListener="#{pagamentoMB.salvarPagamentos()}" update="formPagamentos, :messages" icon="fa fa-check"/>
+			        	 </f:facet>			        	    	
+			        </p:dataTable>	
+			        
+		        </h:form>		        		
+			</div>	
+			<p:dialog widgetVar="detalhesDialog" header="Detalhes" showEffect="clip" hideEffect="clip" resizable="false" appendTo="@(body)" modal="true">
+				<h:form id="formDetalhesDialog">
+					<p:outputLabel value=" #{pagamentoMB.pagamentoVO.nomeProfissional}"/>	
+			        <p:tabView>
+						<p:tab title="Vale">
+							<p:dataTable id="listaVales" var="vale" value="#{pagamentoMB.vales}" scrollable="true" scrollHeight="280" style="width: 500px;">						     
+						     	<p:column headerText="Data"> 			             
+					       		 	<h:outputText value="#{vale.data}">
+					       		 		<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+					       		 	</h:outputText>  
+					        	</p:column>					        	
+						        <p:column headerText="Valor" style="text-align: center;"> 			             
+					       		 	<h:outputText value="#{vale.valor}" >
+					       		 		<f:convertNumber type="currency" currencySymbol=""/>
+					       		 	</h:outputText>      
+					        	</p:column>					        	
+						        <p:columnGroup type="footer">
+						            <p:row>           				            
+						                <p:column colspan="5" style="text-align:right" footerText="Total: #{pagamentoMB.totalVale}"/>
+						            </p:row>
+						        </p:columnGroup>			        			        	
+					        </p:dataTable>
+						</p:tab>
+						<p:tab title="Outros">
+							<p:dataTable id="listaOutros" var="outros" value="#{pagamentoMB.listOutros}" scrollable="true" scrollHeight="280" style="width: 500px;"> 						     	
+						     	<p:column headerText="Data" width="80"> 			             
+					       		 	<h:outputText value="#{outros.data}">
+					       		 		<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+					       		 	</h:outputText>  
+					        	</p:column>
+						     	<p:column headerText="Descrição"> 			             
+					       		 	<h:outputText value="#{outros.descricao}"/>
+					        	</p:column>					        				        	
+						        <p:column headerText="Valor" width="70" style="text-align: center;"> 			             
+					       		 	<h:outputText value="#{outros.valor}" >
+					       		 		<f:convertNumber type="currency" currencySymbol=""/>
+					       		 	</h:outputText>      
+					        	</p:column>					        	 
+						        <p:columnGroup type="footer">
+						            <p:row>           				            
+						                <p:column colspan="5" style="text-align:right" footerText="Total: #{pagamentoMB.totalOutros}"/>
+						            </p:row>
+						        </p:columnGroup>			        			        	
+					        </p:dataTable>
+						</p:tab>					
+					</p:tabView>		        
+		        </h:form>	
+		    </p:dialog>	
+		    <p:dialog widgetVar="ajusteDialog" id="ajusteDlg" header="Ajustar Saldo" showEffect="clip" hideEffect="clip" resizable="false" appendTo="@(body)" modal="true" closable="false">
+				<h:form id="formAjusteDialog">
+					<h:panelGrid columns="2" cellspacing="8">
+						<p:outputLabel value=" #{pagamentoMB.pagamentoVO.nomeProfissional}"/>
+						<p:outputLabel value=""/>
+						<p:outputLabel value="Valor" for="valor"/>
+						<p:inputNumber value="#{pagamentoMB.valorAjuste}" requiredMessage="Informe o valor" id="valor" required="true" autocomplete="off"/>					
+					</h:panelGrid>
+					<h:panelGrid columns="3" cellspacing="8">						
+						<p:commandButton value="Incrementar valor" icon="fa fa-plus" actionListener="#{pagamentoMB.incrementarValor()}" oncomplete="PF('ajusteDialog').hide()" update=":formPagamentos, :messages"/>
+						<p:commandButton value="Decrementar valor" icon="fa fa-minus" actionListener="#{pagamentoMB.decrementarValor()}" oncomplete="PF('ajusteDialog').hide()" update=":formPagamentos, :messages"/>
+						<p:commandButton value="Cancelar" icon="fa fa-close" actionListener="#{pagamentoMB.cancelarAjuste()}" oncomplete="PF('ajusteDialog').hide()"/>
+					</h:panelGrid>				
+				</h:form>
+			</p:dialog>		
+		</ui:define>
+	</ui:composition>
+</html>

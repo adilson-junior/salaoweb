@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pm="http://primefaces.org/mobile">
+
+<f:view renderKitId="PRIMEFACES_MOBILE" />
+
+<h:head>
+<script type="text/javascript">
+PrimeFaces.locales['pt_BR'] = {
+ closeText: 'Fechar',
+ prevText: 'Anterior',
+ nextText: 'Próximo',
+ currentText: 'Começo',
+ monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+ monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun', 'Jul','Ago','Set','Out','Nov','Dez'],
+ dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+ dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+ dayNamesMin: ['D','S','T','Q','Q','S','S'],
+ weekHeader: 'Semana',
+ firstDay: 1,
+ isRTL: false,
+ showMonthAfterYear: false,
+ yearSuffix: '',
+ timeOnlyTitle: 'Só Horas',
+ timeText: 'Tempo',
+ hourText: 'Hora',
+ minuteText: 'Minuto',
+ secondText: 'Segundo',
+ currentText: 'Data Atual',
+ ampm: false,
+ month: 'Mês',
+ week: 'Semana',
+ day: 'Dia',
+ allDayText : 'Todo Dia'
+   };
+</script>
+<title>Salão</title>
+</h:head>
+
+<h:body>
+
+	<pm:page id="financeiro">
+		<pm:header fixed="true">
+			<p:tabMenu activeIndex="2">
+				<p:menuitem value="Início" icon="ui-icon-home" url="/m/pg/index.jsf" iconPos="top"/>
+				<p:menuitem value="Agenda" icon="ui-icon-calendar" url="/m/pg/agenda.jsf" iconPos="top"/>
+				<p:menuitem value="Financeiro" icon="ui-icon-grid" url="/m/pg/financeiro.jsf" iconPos="top"/>			
+			</p:tabMenu>
+		</pm:header>			
+		
+		<pm:content>
+			<h:form id="formEventos">
+				<p:commandButton value="Atendimentos Hoje" action="#{mextratoMB.listarAtendimentosHoje()}" update=":atendimentos_hoje"  icon="ui-icon-shop"/>
+				<p:commandButton value="Saldo"  action="#{mextratoMB.calcaluarSaldo()}" update=":saldo_mes" icon="ui-icon-bars"/>				
+			</h:form>		
+		</pm:content>
+
+		<pm:footer title="Salão Web" fixed="true"/>
+	</pm:page>
+	
+	<pm:page id="saldo_mes">
+		<pm:header fixed="true" title="Saldo">
+			<p:button value="&nbsp;" outcome="pm:financeiro" icon="ui-icon-arrow-l"/>
+		</pm:header>	
+			
+		<pm:content>
+			<h:form id="formSaldo">
+				<p:selectOneRadio value="#{mextratoMB.periodo}">
+					<p:ajax event="change" process="@this" listener="#{mextratoMB.calcaluarSaldo()}" update="formSaldo" />
+					<f:selectItem itemLabel="Total do Mês" itemValue="M" />			
+		            <f:selectItem itemLabel="Hoje" itemValue="H" />		                       
+		        </p:selectOneRadio>
+				<p:panel header="Serviços e Produtos">
+					<h:panelGrid columns="2">
+						<h:outputText value="Valor:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" style="font-weight: bold;"/>				
+						<h:outputText value="#{mextratoMB.totalValor}"/>
+						<h:outputText value="Desconto:&nbsp;" style="font-weight: bold;"/>				
+						<h:outputText value="#{mextratoMB.totalDesconto}" style="color: #FE2E2E;"/>	
+						<h:outputText value="Total:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" style="font-weight: bold;"/>				
+						<h:outputText value="#{mextratoMB.total}"/>	
+					</h:panelGrid>					
+				</p:panel>				
+				<p:spacer height="10"/>
+				<p:panel header="Lançamentos">				
+					<h:panelGrid columns="2">					
+						<h:outputText value="Vale:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" style="font-weight: bold;"/>				
+						<h:outputText value="#{mextratoMB.totalVale}" style="color: #FE2E2E;"/>	
+						<h:outputText value="Outros:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" style="font-weight: bold;"/>				
+						<h:outputText value="#{mextratoMB.totalOutros}" style="color: #FE2E2E;"/>	
+					</h:panelGrid>				
+				</p:panel>
+				<p:spacer height="10"/>
+				<p:panel header="Comissão">
+					<p>	
+					<h:outputText value="Total:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" style="font-weight: bold;"/>				
+					<h:outputText value="#{mextratoMB.totalComissao}"/>	
+					</p>	
+				</p:panel>
+				<p>					
+				<h:outputText value="Saldo Final: " style="font-weight: bold;"/>	
+				<h:outputText value="#{mextratoMB.saldo}"/>	
+				</p>
+											
+			</h:form>
+		</pm:content>
+				
+		<pm:footer title="Salão Web" fixed="true"/>
+	</pm:page>
+	
+	<pm:page id="atendimentos_hoje">
+		<pm:header fixed="true" title="Atend. Hoje">
+			<p:button value="&nbsp;" outcome="pm:financeiro" icon="ui-icon-arrow-l"/>
+		</pm:header>	
+			
+		<pm:content>
+			<h:form id="formAtendimentos">
+				<p:dataTable var="item" value="#{mextratoMB.itens}" reflow="true" id="listaItens" style="padding:0px;">				    		    	
+					<p:column headerText="Cliente">
+						<h:outputText value="#{item.cliente.nome}" />
+					</p:column>			
+					<p:column headerText="Serviço">
+						<h:outputText value="#{item.nomeItem}" />
+					</p:column>		
+					<p:column headerText="Valor">
+						<h:outputText value="#{item.valor}">
+							<f:convertNumber type="currency" currencySymbol=""/>
+						</h:outputText>
+					</p:column>	
+					<p:column headerText="Quant.">
+						<h:outputText value="#{item.quantidade}"/>
+					</p:column>	
+					<p:column headerText="Valor Total">
+						<h:outputText value="#{item.valor * item.quantidade}">
+							<f:convertNumber type="currency" currencySymbol=""/>
+						</h:outputText>
+					</p:column>	
+					<p:column headerText="Desconto">
+						<h:outputText value="#{item.desconto}">
+							<f:convertNumber type="currency" currencySymbol=""/>
+						</h:outputText>
+					</p:column>	
+					<p:column headerText="Total">
+						<h:outputText value="#{(item.valor * item.quantidade) - item.desconto}">
+							<f:convertNumber type="currency" currencySymbol=""/>
+						</h:outputText>
+					</p:column>					
+				</p:dataTable>	
+			</h:form>
+		</pm:content>
+				
+		<pm:footer title="Salão Web" fixed="true"/>
+	</pm:page>
+
+</h:body>
+
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:composition template="/WEB-INF/template/principal.xhtml">
+		<ui:define name="head">
+			<link type="text/css" rel="stylesheet" href="#{request.contextPath}/css/postagem.css" />
+			<script type="">
+				PrimeFaces.locales['pt_BR'] = {
+                closeText: 'Fechar',
+                prevText: 'Anterior',
+                nextText: 'Próximo',
+                currentText: 'Começo',
+                monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+                monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun', 'Jul','Ago','Set','Out','Nov','Dez'],
+                dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+                dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+                dayNamesMin: ['D','S','T','Q','Q','S','S'],
+                weekHeader: 'Semana',
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: '',
+                timeOnlyTitle: 'Só Horas',
+                timeText: 'Tempo',
+                hourText: 'Hora',
+                minuteText: 'Minuto',
+                secondText: 'Segundo',
+                currentText: 'Data Atual',
+                ampm: false,
+                month: 'Mês',
+                week: 'Semana',
+                day: 'Dia',
+                allDayText : 'Todo Dia'
+            };
+			</script>
+		</ui:define>	
+		<ui:define name="conteudo-esquerdo">			
+			<p:panel>
+				<h:form id="formEventos">
+				<h:panelGrid columns="1">
+					<p:outputLabel value="Data Inicial"/>
+					<p:calendar value="#{hGeralMB.dataInicio}" locale="pt_BR" navigator="true" pattern="dd/MM/yyyy" yearRange="c-5:c+5" 
+							required="true" requiredMessage="Data de Nascimento deve ser informado"/>
+					<p:outputLabel value="Data Final"/>
+					<p:calendar value="#{hGeralMB.dataFinal}" locale="pt_BR" navigator="true" pattern="dd/MM/yyyy" yearRange="c-5:c+5" 
+							required="true" requiredMessage="Data de Nascimento deve ser informado"/>
+					<p:outputLabel value="Cliente"/>
+					<p:autoComplete value="#{hGeralMB.cliente}" completeMethod="#{hGeralMB.pesquisarCliente}" converter="clienteConverter" placeholder="Todos"
+			        	var="cliente" itemValue="#{cliente}" itemLabel="#{cliente.nome}" dropdown="true" forceSelection="true" minQueryLength="2" id="completeCliente"/>
+			        <p:outputLabel></p:outputLabel>
+			        <p:commandButton value="Atualizar" actionListener="#{hGeralMB.calcularExtrato()}" icon="fa fa-refresh" update=":tableComandas, :messages"/>
+				</h:panelGrid>				
+			</h:form>			
+			</p:panel>			
+		</ui:define>	
+		<ui:define name="conteudo">		
+			<div class="conteudo-cadastros">	
+				<h2 style="margin:0;"><span style="color: #848484;">Financeiro &gt; Histórico &gt; </span> Vendas</h2>	
+				<p:separator style="width:980px; float:left; height:10px;"/>					
+				<p:spacer height="10"/>			
+				<p:messages id="messages" showDetail="true" autoUpdate="false" showSummary="false"/>
+				<p:tabView id="tableComandas">
+					<p:tab title="Comandas">
+						<p:dataTable id="listaComandas" var="extrato" value="#{hGeralMB.extratos}" scrollable="true" scrollHeight="350">       
+					     	<p:column headerText="Data" width="80"> 			             
+				       		 	<h:outputText value="#{extrato.data}">
+				       		 		<f:convertDateTime pattern="dd/MM/yyyy"/>
+				       		 	</h:outputText>  
+				        	</p:column>	
+					        <p:column headerText="Cliente" width="270"> 			             
+				       		 	<h:outputText value="#{extrato.cliente}"/>  
+				        	</p:column>	
+				        	<p:column headerText="Valor" style="text-align: right !important;"> 			             
+				       		 	<h:outputText value="#{extrato.valorTotalComanda}">
+				       		 		<f:convertNumber type="currency" currencySymbol=""/>
+				       		 	</h:outputText>  
+				        	</p:column> 				       				    
+				        	<p:column headerText="Desconto" style="text-align: right !important;"> 			             
+				       		 	<h:outputText value="#{extrato.descontoTotalComanda}" style="color: #FF0000;">
+				       		 		<f:convertNumber type="currency" currencySymbol=""/>
+				       		 	</h:outputText>    
+				        	</p:column> 				           
+				        	<p:column headerText="Total" style="text-align: right !important;"> 			             
+				       		 	<h:outputText value="#{extrato.total}">
+				       		 		<f:convertNumber type="currency" currencySymbol=""/>
+				       		 	</h:outputText>    
+				        	</p:column>				        	
+				        	<p:columnGroup type="footer">
+					            <p:row>
+					                <p:column footerText=""/>
+					                <p:column footerText=""/>
+					                <p:column footerText="#{hGeralMB.totalValor}" style="text-align: right !important;"/>					 
+					                <p:column footerText="#{hGeralMB.totalDesconto}" style="text-align: right !important;"/>	
+					                <p:column footerText="#{hGeralMB.totalComanda}" style="text-align: right !important;"/>
+					            </p:row>
+					        </p:columnGroup>			        	
+				        </p:dataTable>
+					</p:tab>					
+				</p:tabView>				
+			</div>			
+		</ui:define>
+	</ui:composition>
+</html>

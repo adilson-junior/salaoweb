@@ -1,0 +1,289 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:composition template="/WEB-INF/template/principal.xhtml">
+		<ui:define name="head">
+			<link type="text/css" rel="stylesheet" href="#{request.contextPath}/css/postagem.css" />
+			<script type="">
+				PrimeFaces.locales['pt_BR'] = {
+                closeText: 'Fechar',
+                prevText: 'Anterior',
+                nextText: 'Próximo',
+                currentText: 'Começo',
+                monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+                monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun', 'Jul','Ago','Set','Out','Nov','Dez'],
+                dayNames: ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],
+                dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+                dayNamesMin: ['D','S','T','Q','Q','S','S'],
+                weekHeader: 'Semana',
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: '',
+                timeOnlyTitle: 'Só Horas',
+                timeText: 'Tempo',
+                hourText: 'Hora',
+                minuteText: 'Minuto',
+                secondText: 'Segundo',
+                currentText: 'Data Atual',
+                ampm: false,
+                month: 'Mês',
+                week: 'Semana',
+                day: 'Dia',
+                allDayText : 'Todo Dia'
+            };
+			</script>
+		</ui:define>	
+		<ui:define name="conteudo-esquerdo">			
+			<p:panel>
+				<h:form id="formEventos">
+					<h:panelGrid columns="1">
+						<p:outputLabel value="Data Inicial"/>
+						<p:calendar value="#{extratoProfMB.dataInicio}" locale="pt_BR" navigator="true" pattern="dd/MM/yyyy" yearRange="c-5:c+5" 
+								required="true" requiredMessage="Data de Nascimento deve ser informado"/>
+						<p:outputLabel value="Data Final"/>
+						<p:calendar value="#{extratoProfMB.dataFinal}" locale="pt_BR" navigator="true" pattern="dd/MM/yyyy" yearRange="c-5:c+5" 
+								required="true" requiredMessage="Data de Nascimento deve ser informado"/>
+						<p:outputLabel value="Profissional"/>
+						<p:autoComplete value="#{extratoProfMB.profissional}" completeMethod="#{extratoProfMB.pesquisarProfissional}" converter="profissionalConverter"
+				        	var="profissional" itemValue="#{profissional}" itemLabel="#{profissional.nome}" dropdown="true" forceSelection="true" minQueryLength="2" id="completeProfissional"/>
+				        <p:outputLabel></p:outputLabel>
+				        <p:selectOneRadio value="#{extratoProfMB.tipoExtrato}">
+				            <f:selectItem itemLabel="Resumido" itemValue="R" />
+				            <f:selectItem itemLabel="Detalhado" itemValue="D" />			           
+				        </p:selectOneRadio>
+				        <p:outputLabel></p:outputLabel>
+				        <p:commandButton value="Atualizar" actionListener="#{extratoProfMB.calcularExtrato()}" icon="fa fa-refresh" update=":formTabs, :saldoTotal, :messages"/>
+					</h:panelGrid>				
+				</h:form>			
+			</p:panel>			
+		</ui:define>	
+		<ui:define name="conteudo">		
+			<div class="conteudo-cadastros">					
+				<h2 style="margin:0;"><span style="color: #848484;">Financeiro &gt; Profissional &gt; </span> Extrato</h2>	
+				<p:separator style="width:980px; float:left; height:10px;"/>					
+				<p:spacer height="10"/>			
+				<p:messages id="messages" showDetail="true" autoUpdate="false" showSummary="false"/>
+				<h:form id="formTabs">
+					<p:tabView id="tableComandas" rendered="#{extratoProfMB.exibirResumido}">
+						<p:tab title="Resumido">
+							<p:dataTable id="listaComandas" var="extratoDet" value="#{extratoProfMB.extratosDetalhados}" scrollable="true" scrollHeight="340">       
+						     	<p:column headerText="Data" width="75"> 			             
+					       		 	<h:outputText value="#{extratoDet.data}">
+					       		 		<f:convertDateTime pattern="dd/MM/yyyy"/>
+					       		 	</h:outputText>  
+					        	</p:column>	
+						        <p:column headerText="Cliente"> 			             
+					       		 	<h:outputText value="#{extratoDet.cliente}"/>  
+					        	</p:column>					        	
+					        	<p:column headerText="Valor" width="65" style="text-align: center;"> 			             
+					       		 	<h:outputText value="#{extratoDet.valor}">
+					       		 		<f:convertNumber type="currency" currencySymbol=""/>
+					       		 	</h:outputText>  
+					        	</p:column> 				        			       				    
+					        	<p:column headerText="Desconto" width="65" style="text-align: center;"> 			             
+					       		 	<h:outputText value="#{extratoDet.desconto}" style="color: #FF0000;">
+					       		 		<f:convertNumber type="currency" currencySymbol=""/>
+					       		 	</h:outputText>    
+					        	</p:column> 				           
+					        	<p:column headerText="Total" width="65" style="text-align: center;"> 			             
+					       		 	<h:outputText value="#{extratoDet.total}">
+					       		 		<f:convertNumber type="currency" currencySymbol=""/>
+					       		 	</h:outputText>    
+					        	</p:column>				        	
+					        	<p:column headerText="Comissão (R$)" width="120" style="text-align: center;"> 			             
+					       		 	<h:outputText value="#{extratoDet.comissao}">
+					       		 		<f:convertNumber type="currency" currencySymbol=""/>
+					       		 	</h:outputText>    
+					        	</p:column>				        	    	
+					        	<p:columnGroup type="footer">
+						            <p:row>           				            
+						                <p:column colspan="10" style="text-align:right" footerText="Total: #{extratoProfMB.totalComissao}"/>
+						            </p:row>
+						        </p:columnGroup>			        	
+					        </p:dataTable>
+						</p:tab>	
+						<p:tab title="Vale">
+							<p:dataTable id="listaVales" var="vale" value="#{extratoProfMB.vales}" scrollable="true" scrollHeight="350">  
+						     	<p:column headerText="Id" width="70"> 			             
+					       		 	<h:outputText value="#{vale.id}"/>
+					        	</p:column>	
+						     	<p:column headerText="Data"> 			             
+					       		 	<h:outputText value="#{vale.data}">
+					       		 		<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+					       		 	</h:outputText>  
+					        	</p:column>				        	
+						        <p:column headerText="Valor" style="text-align: center;"> 			             
+					       		 	<h:outputText value="#{vale.valor}">
+					       		 		<f:convertNumber type="currency" currencySymbol=""/>
+					       		 	</h:outputText>      
+					        	</p:column>	
+					        	 <p:column headerText="Autorização"> 			             
+					       		 	<h:outputText value="#{vale.usuarioAutoriza}"/>					       		 		
+					        	</p:column>			        	
+						        <p:columnGroup type="footer">
+						            <p:row>           				            
+						                <p:column colspan="5" style="text-align:right" footerText="Total: #{extratoProfMB.totalVale}"/>
+						            </p:row>
+						        </p:columnGroup>			        			        	
+					        </p:dataTable>
+					   </p:tab>			
+						<p:tab title="Outros">
+							<p:dataTable id="listaOutros" var="outros" value="#{extratoProfMB.listOutros}" scrollable="true" scrollHeight="350">  
+						     	<p:column headerText="Id" width="70"> 			             
+					       		 	<h:outputText value="#{outros.id}"/>
+					        	</p:column>	
+						     	<p:column headerText="Data"> 			             
+					       		 	<h:outputText value="#{outros.data}">
+					       		 		<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+					       		 	</h:outputText>  
+					        	</p:column>		
+					        	<p:column headerText="Descrição"> 			             
+					       		 	<h:outputText value="#{outros.descricao}"/>					       		 		
+					        	</p:column>			        	
+						        <p:column headerText="Valor" style="text-align: center;"> 			             
+					       		 	<h:outputText value="#{outros.valor}">
+					       		 		<f:convertNumber type="currency" currencySymbol=""/>
+					       		 	</h:outputText>      
+					        	</p:column>		
+					        	 <p:column headerText="Autorização"> 			             
+					       		 	<h:outputText value="#{outros.usuarioAutoriza}"/>					       		 		
+					        	</p:column>				        	
+						        <p:columnGroup type="footer">
+						            <p:row>           				            
+						                <p:column colspan="5" style="text-align:right" footerText="Total: #{extratoProfMB.totalOutros}"/>
+						            </p:row>
+						        </p:columnGroup>			        			        	
+					        </p:dataTable>
+						</p:tab>
+					</p:tabView>
+					<p:tabView id="tableItens" rendered="#{extratoProfMB.exibirDetalhado}">
+						<p:tab title="Detalhado">
+							<p:dataTable id="listaItens" var="extratoDet" value="#{extratoProfMB.extratosDetalhados}" scrollable="true" scrollHeight="350">       
+						     	<p:column headerText="Data" width="75"> 			             
+					       		 	<h:outputText value="#{extratoDet.data}">
+					       		 		<f:convertDateTime pattern="dd/MM/yyyy"/>
+					       		 	</h:outputText>  
+					        	</p:column>	
+						        <p:column headerText="Cliente"> 			             
+					       		 	<h:outputText value="#{extratoDet.cliente}"/>  
+					        	</p:column>	
+					        	<p:column headerText="Item"> 			             
+					       		 	<h:outputText value="#{extratoDet.item}"/>  
+					        	</p:column>
+					        	<p:column headerText="Valor" width="65" style="text-align:center;"> 			             
+					       		 	<h:outputText value="#{extratoDet.valor}">
+					       		 		<f:convertNumber type="currency" currencySymbol=""/>
+					       		 	</h:outputText>  
+					        	</p:column> 
+					        	<p:column headerText="Qtd" width="30" style="text-align: center;"> 			             
+					       		 	<h:outputText value="#{extratoDet.qtd}"/>				       		 		
+					        	</p:column>				       				    
+					        	<p:column headerText="Desconto" width="65" style="text-align: center;"> 			             
+					       		 	<h:outputText value="#{extratoDet.desconto}" style="color: #FF0000;">
+					       		 		<f:convertNumber type="currency" currencySymbol=""/>
+					       		 	</h:outputText>    
+					        	</p:column> 				           
+					        	<p:column headerText="Total" width="65" style="text-align:center;"> 			             
+					       		 	<h:outputText value="#{extratoDet.total}">
+					       		 		<f:convertNumber type="currency" currencySymbol=""/>
+					       		 	</h:outputText>    
+					        	</p:column>
+					        	<p:column headerText="Comissão (%)" width="65" style="text-align: center;"> 			             
+					       		 	<h:outputText value="#{extratoDet.percentComissao}"/>
+					        	</p:column>		
+					        	<p:column headerText="Comissão (R$)" width="65" style="text-align: center;"> 			             
+					       		 	<h:outputText value="#{extratoDet.comissao}">
+					       		 		<f:convertNumber type="currency" currencySymbol=""/>
+					       		 	</h:outputText>    
+					        	</p:column>				        	    	
+					        	<p:columnGroup type="footer">
+						            <p:row>           				            
+						                <p:column colspan="10" style="text-align:right" footerText="Total: #{extratoProfMB.totalComissao}"/>
+						            </p:row>
+						        </p:columnGroup>			        	
+					        </p:dataTable>
+						</p:tab>	
+						<p:tab title="Vale">
+							<p:dataTable id="listaVales" var="vale" value="#{extratoProfMB.vales}" scrollable="true" scrollHeight="350">  
+						     	<p:column headerText="Id" width="70"> 			             
+					       		 	<h:outputText value="#{vale.id}"/>
+					        	</p:column>	
+						     	<p:column headerText="Data"> 			             
+					       		 	<h:outputText value="#{vale.data}">
+					       		 		<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+					       		 	</h:outputText>  
+					        	</p:column>				        	
+						        <p:column headerText="Valor" style="text-align: center;"> 			             
+					       		 	<h:outputText value="#{vale.valor}">
+					       		 		<f:convertNumber type="currency" currencySymbol=""/>
+					       		 	</h:outputText>      
+					        	</p:column>	
+					        	<p:column headerText="Autorização"> 			             
+					       		 	<h:outputText value="#{vale.usuarioAutoriza}"/>					       		 		
+					        	</p:column>					        	
+						        <p:columnGroup type="footer">
+						            <p:row>           				            
+						                <p:column colspan="5" style="text-align:right" footerText="Total: #{extratoProfMB.totalVale}"/>
+						            </p:row>
+						        </p:columnGroup>			        			        	
+					        </p:dataTable>
+					   </p:tab>			
+					   <p:tab title="Outros">
+						   	<p:dataTable id="listaOutros" var="outros" value="#{extratoProfMB.listOutros}" scrollable="true" scrollHeight="350">  
+						     	<p:column headerText="Id" width="70"> 			             
+					       		 	<h:outputText value="#{outros.id}"/>
+					        	</p:column>	
+						     	<p:column headerText="Data"> 			             
+					       		 	<h:outputText value="#{outros.data}">
+					       		 		<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+					       		 	</h:outputText>  
+					        	</p:column>		
+					        	<p:column headerText="Descrição"> 			             
+					       		 	<h:outputText value="#{outros.descricao}"/>					       		 		
+					        	</p:column>			        	
+						        <p:column headerText="Valor" style="text-align: center;"> 			             
+					       		 	<h:outputText value="#{outros.valor}">
+					       		 		<f:convertNumber type="currency" currencySymbol=""/>
+					       		 	</h:outputText>      
+					        	</p:column>		
+					        	 <p:column headerText="Autorização"> 			             
+					       		 	<h:outputText value="#{outros.usuarioAutoriza}"/>					       		 		
+					        	</p:column>				        	
+						        <p:columnGroup type="footer">
+						            <p:row>           				            
+						                <p:column colspan="5" style="text-align:right" footerText="Total: #{extratoProfMB.totalOutros}"/>
+						            </p:row>
+						        </p:columnGroup>			        			        	
+					        </p:dataTable>
+					   </p:tab>				
+					</p:tabView>
+				</h:form>
+				<p:spacer height="1"/>					
+				<h:panelGrid columns="8" cellspacing="10" id="saldoTotal">
+					<p:outputLabel value="Comissão:" style="font-weight: bold;"/>
+					<p:outputLabel value="#{extratoProfMB.totalComissao}">
+						<f:convertNumber type="currency" />
+					</p:outputLabel>
+					<p:outputLabel value="Vale:" style="font-weight: bold;"/>
+					<p:outputLabel value="#{extratoProfMB.totalVale}" >
+						<f:convertNumber type="currency" />
+					</p:outputLabel>
+					<p:outputLabel value="Outros:" style="font-weight: bold;"/>
+					<p:outputLabel value="#{extratoProfMB.totalOutros}">
+						<f:convertNumber type="currency" />
+					</p:outputLabel>
+					<p:outputLabel value=" Saldo:" style="font-weight: bold;"/>
+					<p:outputLabel value="#{extratoProfMB.saldo}" style="color: #0040FF;">
+						<f:convertNumber type="currency" />
+					</p:outputLabel>
+				</h:panelGrid>					
+			</div>			
+		</ui:define>
+	</ui:composition>
+</html>

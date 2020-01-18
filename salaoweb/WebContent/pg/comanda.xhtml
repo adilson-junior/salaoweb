@@ -1,0 +1,242 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:composition template="/WEB-INF/template/principal.xhtml">	
+		<ui:define name="head">
+			<script type="text/javascript" src="#{request.contextPath}/js/calc_format_moeda.js"></script>			
+		</ui:define>
+		<ui:define name="conteudo-esquerdo">			
+			<h:form id="formComandas">
+				<p:orderList value="#{comandaMB.clientesAgendas}" var="cliente" itemValue="#{cliente}" 
+				itemLabel="#{cliente.nome}" converter="clienteConverter" controlsLocation="none" disabled="#{comandaMB.bloquearListasComandas}" id="comandasAbertas">
+					<p:ajax event="select" listener="#{comandaMB.comandaAbertaSelecionado}" update=":formEventos, :formListItens, :titulo, :subTotal, :messages, comandasFechadas"/>
+					<f:facet name="caption">Comandas Abertas</f:facet>			        
+				</p:orderList>
+				<p:spacer height="10"/>
+				<p:orderList value="#{comandaMB.comandasFechadas}" var="comanda" itemValue="#{comanda}" 
+				itemLabel="#{comanda.id} #{comanda.nomeTemp}" converter="comandaConverter" controlsLocation="none" disabled="#{comandaMB.bloquearListasComandas}" id="comandasFechadas">
+					<p:ajax event="select" listener="#{comandaMB.comandaFechadaSelecionado}" update=":formEventos, :formListItens, :subTotal, :titulo, comandasAbertas"/>
+					<f:facet name="caption">Comandas Fechadas</f:facet>		
+				</p:orderList>
+			</h:form>
+		</ui:define>	
+		<ui:define name="conteudo">		
+			<div class="conteudo-cadastros">	
+				<h2 style="margin:0;">Comanda <p:outputLabel value="#{comandaMB.titulo}" id="titulo"/></h2>
+				<p:separator style="width:980px; float:left; height:10px;"/>					
+				<p:spacer height="10"/>			
+				<p:messages id="messages" showDetail="true" autoUpdate="false" showSummary="false"/>
+				<h:form id="formListItens">					
+					<p:dataTable id="listaItens" var="item" value="#{comandaMB.itens}"  					
+			                 rowKey="#{item.id}" scrollable="true" scrollHeight="215"
+			                 > 
+			            <p:column headerText="Item" style="text-align: center;" footerText="Total">  			            	
+			            	#{item.nomeItem}
+				        </p:column>		       		  
+				        <p:column headerText="Qtd" width="25" footerText="#{comandaMB.totalIntens}" style="text-align: center;"> 	  
+				        	#{item.quantidade}    
+				        </p:column> 				      
+				        <p:column headerText="Valor" width="70" footerText="#{comandaMB.totalValor}" style="text-align: center;"> 
+				       		<h:outputText value="#{item.valor}" >
+			            		<f:convertNumber type="currency" currencySymbol=""/>
+			            	</h:outputText>				        	        	 		            
+				        </p:column>
+				        <p:column headerText="Desconto" width="70" footerText="#{comandaMB.totalDesconto}" style="text-align: center;"> 				        	
+				        	<h:outputText value="#{item.desconto}" >
+			            		<f:convertNumber type="currency" currencySymbol=""/>
+			            	</h:outputText>					        		        	 		            
+				        </p:column>
+				        <p:column headerText="Total" width="70" footerText="#{comandaMB.subTotal}" style="text-align: center;">	    
+				        	<h:outputText value="#{(item.quantidade * item.valor)-item.desconto}" >
+			            		<f:convertNumber type="currency" currencySymbol=""/>
+			            	</h:outputText>					        	      	  			            
+				        </p:column>		
+				        <p:column headerText="Profissional" style="text-align: center;">	
+				        	#{item.profissional.nome}               	  			            
+				        </p:column>			
+				       <p:column headerText="Editar" width="45" style="text-align: center;"> 
+				        	<p:commandButton icon="fa fa-edit" title="Editar Item" onclick="PF('editarItemDialog').show()" update=":formEditarItem" disabled="#{comandaMB.bloquearEventos}">
+				        		<f:setPropertyActionListener target="#{comandaMB.itemSelecionado}" value="#{item}"/>
+				        	</p:commandButton>				            	        	 		            
+				        </p:column>
+				        <p:column headerText="Excluir" width="45" style="text-align: center;"> 		
+					        <p:commandButton icon="fa fa-close" title="Excluir Item" action="#{comandaMB.excluirItem()}" update="formListItens, :subTotal" disabled="#{comandaMB.bloquearEventos}">
+				            	<f:setPropertyActionListener target="#{comandaMB.itemSelecionado}" value="#{item}"/>
+				            </p:commandButton>		         	  			            
+				        </p:column>        
+			        </p:dataTable>
+				</h:form>
+				<h:form id="formEventos">
+					<h:panelGrid columns="5" cellspacing="8">
+						<p:commandButton onclick="PF('novaComandaDialog').show()" icon="fa fa-plus" title="Nova Comanda" value="Nova Comanda" type="button" update=":formNovaComandaDialog, :messages"/>
+						<p:commandButton icon="fa fa-cart-plus" value="Incluir Item" onclick="PF('incluirItemDialog').show()" disabled="#{comandaMB.bloquearEventos}" type="button"/>
+						<p:commandButton icon="fa fa-money" value="Receber" oncomplete="PF('pagamentoDialog').show()" update=":formPagamento" disabled="#{comandaMB.bloquearEventos}"/>
+						<p:spacer width="345" height="0"/>					
+						<p:commandButton icon="fa fa-close" value="Cancelar" disabled="#{comandaMB.bloquearEventos}" onclick="PF('cancelarComandaDialog').show()"/>
+					</h:panelGrid>					
+				</h:form>				
+				<h:panelGrid columns="2" cellspacing="8" id="subTotal">
+					<p:outputLabel value="Total: " style="font-weight: bold;"/>
+					<p:outputLabel value="${comandaMB.totalValor}">
+						<f:convertNumber type="currency" />
+					</p:outputLabel>
+					<p:outputLabel value="Desconto: " style="font-weight: bold;"/>
+					<p:outputLabel value="${comandaMB.totalDesconto}" style="color:#FE2E2E;">
+						<f:convertNumber type="currency" />
+					</p:outputLabel>
+					<p:outputLabel value="Total a pagar: " style=" font-weight: bold;"/>
+					<p:outputLabel value="${comandaMB.subTotal}" >
+						<f:convertNumber type="currency" />
+					</p:outputLabel>
+				</h:panelGrid>				
+			</div>
+			<p:confirmDialog message="Incluir Serviço ou Produto?" severity="info" header="Incluir Item" widgetVar="incluirItemDialog" appendTo="@(body)" modal="true">
+		       <h:form>
+		       		<p:commandButton value="Serviço" actionListener="#{comandaMB.prepararIncluirServico()}" onclick="PF('itemServicoDialog').show();PF('incluirItemDialog').hide();" update=":formItemServicoDialog"/>
+		        	<p:commandButton value="Produto" actionListener="#{comandaMB.prepararIncluirProduto()}" onclick="PF('itemProdutoDialog').show();PF('incluirItemDialog').hide();" update=":formItemProdutoDialog"/>
+		       </h:form>
+		    </p:confirmDialog>
+		    <p:confirmDialog message="A comanda será excluída permanentemente, deseja continuar?" header="Cancelar Comanda" widgetVar="cancelarComandaDialog" appendTo="@(body)" modal="true">
+		        <p:commandButton value="Sim" actionListener="#{comandaMB.cancelarComanda()}" oncomplete="PF('cancelarComandaDialog').hide()" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" update=":messages, :formComandas, :formEventos, :formListItens, :titulo, :subTotal"/>
+		        <p:commandButton value="Não" type="button" onclick="PF('cancelarComandaDialog').hide()" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+		    </p:confirmDialog>
+			<p:dialog header="Pagamento" widgetVar="pagamentoDialog" resizable="false" id="pagamentoDlg" appendTo="@(body)" modal="true" width="500" closable="false">		
+				<h:form id="formPagamento">			
+					<div style="font-size: 1.1em; text-align: center; width: 100%; margin: 0 auto;">
+						<p:outputLabel value="#{comandaMB.clienteSelecionado.nome}" />
+					</div>	
+					<p:separator style="width:100%; float:center; height:5px;"/>	
+					<h:panelGrid columns="3" cellspacing="0">
+						<p:outputLabel value="Total a pagar" style="font-weight: bold; font-size: 1.1em;"/>	
+						<p:spacer height="0" width="300"/>								
+						<p:outputLabel value="#{comandaMB.subTotal}" style="background: #2EFE2E !important; padding: 5px;" id="outTotalApagar">
+							<f:convertNumber type="currency" />
+						</p:outputLabel>																	
+					</h:panelGrid>	
+					<p:separator style="width:100%; float:center; height:5px;"/>	
+					<h:panelGrid columns="3" cellspacing="5">
+						<p:outputLabel value="Dinheiro" style="font-weight: bold; font-size: 1.1em;"/>									
+						<p:inputNumber value="#{comandaMB.entrada}" size="15" id="inDinheiro" decimalSeparator="," thousandSeparator="." symbolPosition="s" decimalPlaces="2" autocomplete="off" onkeyup="calcular();"/>		
+						<p:spacer height="0" width="0"/>
+						<p:outputLabel value="Cartão Débito" style="font-weight: bold; font-size: 1.1em;"/>									
+						<p:inputNumber  value="#{comandaMB.cartaoDebito.valor}" size="15" id="inCartaoDebito" decimalSeparator="," thousandSeparator="." symbolPosition="s" decimalPlaces="2" autocomplete="off" disabled="#{comandaMB.bloquearInputDebito}" onkeyup="calcular();"/>	
+						<p:selectOneMenu value="#{comandaMB.cartaoDebito.bandeira}" converter="bandeiraConverter" style="width:140px">
+							<p:ajax event="itemSelect" listener="#{comandaMB.atualizarInputDebito}" update="inCartaoDebito"/>
+				            <f:selectItem itemLabel="Selecione Bandeira" itemValue="" />				         
+				            <f:selectItems value="#{comandaMB.bandeiras}" var="#bandeira" itemLabel="#{bandeira}" itemValue="#{bandeira}" />
+				        </p:selectOneMenu>
+						<p:outputLabel value="Cartão Crédito" style="font-weight: bold; font-size: 1.1em;"/>									
+						<p:inputNumber value="#{comandaMB.cartaoCredito.valor}" size="15" id="inCartaoCredito" decimalSeparator="," thousandSeparator="." symbolPosition="s" decimalPlaces="2" autocomplete="off" disabled="#{comandaMB.bloquearInputCredito}" onkeyup="calcular();"/>
+						<p:selectOneMenu value="#{comandaMB.cartaoCredito.bandeira}" converter="bandeiraConverter" style="width:140px">
+							<p:ajax event="itemSelect" listener="#{comandaMB.atualizarInputCredito}" update="inCartaoCredito"/>
+				            <f:selectItem itemLabel="Selecione Bandeira" itemValue="" />				         
+				            <f:selectItems value="#{comandaMB.bandeiras}" var="#bandeira" itemLabel="#{bandeira}" itemValue="#{bandeira}" />
+				        </p:selectOneMenu>	
+						<p:outputLabel value="Cheque" style="font-weight: bold; font-size: 1.1em;"/>									
+						<p:inputNumber value="#{comandaMB.cheque.valor}" size="15" id="inCheque" decimalSeparator="," thousandSeparator="." symbolPosition="s" decimalPlaces="2" autocomplete="off" disabled="#{comandaMB.bloquearInputCheque}" onkeyup="calcular();"/>	
+						<p:selectOneMenu value="#{comandaMB.cheque.banco}" converter="bancoConverter" style="width:140px">
+				            <p:ajax event="itemSelect" listener="#{comandaMB.atualizarInputCheque}" update="inCheque"/>
+				            <f:selectItem itemLabel="Selecione Banco" itemValue=""/>				         
+				            <f:selectItems value="#{comandaMB.bancos}" var="#banco" itemLabel="#{banco}" itemValue="#{banco}" />
+				        </p:selectOneMenu>											
+					</h:panelGrid>	
+					<p:separator style="width:100%; float:center; height:5px;"/>
+					<h:panelGrid columns="2" cellspacing="5">
+						<p:outputLabel value="Total de entrada" style="font-weight: bold; font-size: 1.1em;"/>
+						<p:outputLabel value="R$ 00,00" style="padding-left: 10px;" id="outTotalEntrada"/>						
+						<p:outputLabel value="Troco" style="font-weight: bold; font-size: 1.1em;"/>
+						<p:outputLabel value="R$ 00,00" style="padding-left: 10px;" id="outTroco"/>							
+					</h:panelGrid>
+					<p:separator style="width:100%; float:center; height:5px;"/>
+					<h:panelGrid columns="3" cellspacing="0">
+						<p:commandButton value="Finalizar" actionListener="#{comandaMB.pagamento()}" oncomplete="PF('pagamentoDialog').hide()" icon="fa fa-check"
+						 style="background: #2E64FE !important; color: #ffffff !important;" update=":messages, :formComandas, :formEventos, :formListItens, :titulo, :subTotal"/>					
+						<p:spacer height="0" width="260"/>
+						<p:commandButton value="Cancelar" actionListener="#{comandaMB.cancelarPagamento()}" oncomplete="PF('pagamentoDialog').hide()" icon="fa fa-close" style="background: #DF0101 !important; color: #ffffff !important;"/>									
+					</h:panelGrid>
+				</h:form>
+            </p:dialog>	
+           <p:dialog header="Editar Item" widgetVar="editarItemDialog" resizable="false" id="editarItemDlg" appendTo="@(body)" modal="true">		
+				<h:form id="formEditarItem">
+					<h:panelGrid columns="2" cellspacing="8">
+						<p:outputLabel value="Profissional"/>
+						<p:outputLabel value="#{comandaMB.itemSelecionado.profissional.nome}"/>
+						<p:outputLabel value="Item"/>
+						<p:outputLabel value="#{comandaMB.itemSelecionado.nomeItem}"/>
+						<p:outputLabel value="Valor"/>
+						<p:outputLabel value="#{comandaMB.itemSelecionado.valor}">
+							<f:convertNumber type="currency" />
+						</p:outputLabel>
+						<p:outputLabel value="Quantidade" for="quantidade"/>
+						<p:inputNumber id="quantidade" size="15" value="#{comandaMB.itemSelecionado.quantidade}" autocomplete="off"  
+						emptyValue="sign" decimalPlaces="0"/>	
+						<p:outputLabel value="Desconto"/>
+						<p:inputNumber id="valor" size="15" value="#{comandaMB.itemSelecionado.desconto}" decimalSeparator="." autocomplete="off"  
+						emptyValue="sign"/>	
+						<p:commandButton value="Enviar" icon="fa fa-check" actionListener="#{comandaMB.editarItem()}" oncomplete="PF('editarItemDialog').hide()" update=":formListItens, :subTotal, :messages"/>
+					</h:panelGrid>
+				</h:form>
+			</p:dialog>  
+			<p:dialog widgetVar="novaComandaDialog" header="Nova Comanda" showEffect="clip" hideEffect="clip" resizable="false" appendTo="@(body)" modal="true" closable="false">
+				<h:form id="formNovaComandaDialog">					
+			        <h:panelGrid columns="1">
+						<p:outputLabel for="completeCliente" value="Cliente" />						
+			            <p:autoComplete value="#{comandaMB.clienteNovaComanda}" completeMethod="#{comandaMB.pesquisarCliente}" converter="clienteConverter"
+			        	var="cliente" itemValue="#{cliente}" itemLabel="#{cliente.nome}" dropdown="true" forceSelection="true" minQueryLength="2" id="completeCliente"/>
+			        </h:panelGrid>			      
+			         <h:panelGrid columns="2" cellspacing="8">	  	
+			            <p:commandButton value="Criar" actionListener="#{comandaMB.novaComanda()}" oncomplete="PF('novaComandaDialog').hide()" update=":messages, :formComandas, :formEventos, :formListItens, :titulo, :subTotal" icon="fa fa-check"/>
+			            <p:commandButton value="Cancelar" onclick="PF('novaComandaDialog').hide()" icon="fa fa-close"/>	  
+			        </h:panelGrid>
+		        </h:form>	
+		    </p:dialog>	
+			<p:dialog widgetVar="itemServicoDialog" header="Incluir Item - Serviço" showEffect="clip" hideEffect="clip" resizable="false" appendTo="@(body)" modal="true" closable="false">
+				<h:form id="formItemServicoDialog">					
+			        <h:panelGrid columns="1">
+						<p:outputLabel for="profissional" value="Profissional" />						
+			            <p:autoComplete value="#{comandaMB.itemSelecionado.profissional}" completeMethod="#{comandaMB.pesquisarProfissional}" converter="profissionalConverter"
+			        	var="profissional" itemValue="#{profissional}" itemLabel="#{profissional.nome}" dropdown="true" forceSelection="true" minQueryLength="2" id="profissional"/>			        
+			        </h:panelGrid>
+			        <h:panelGrid columns="1">			            
+			        	<p:outputLabel for="servicoList" value="Serviço" />
+			        	<p:pickList id="servicoList" value="#{comandaMB.dualServicos}" var="servico" itemLabel="#{servico}" itemValue="#{servico}"
+			        			showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="servicoConverter">
+			        		<f:facet name="sourceCaption">Disponíveis</f:facet>
+        					<f:facet name="targetCaption">Selecionados</f:facet>
+			        	</p:pickList>			           
+			        </h:panelGrid>
+			         <h:panelGrid columns="2" cellspacing="8">	  	
+			            <p:commandButton value="Incluir" actionListener="#{comandaMB.incluirServico()}" onclick="PF('itemServicoDialog').hide()" update=":messages, :formListItens, :subTotal" icon="fa fa-check"/>
+			            <p:commandButton value="Cancelar" onclick="PF('itemServicoDialog').hide()" update=":messages" icon="fa fa-close"/>	  
+			        </h:panelGrid>
+		        </h:form>	
+		    </p:dialog>	 
+		    <p:dialog widgetVar="itemProdutoDialog" header="Incluir Item - Produto" showEffect="clip" hideEffect="clip" resizable="false" appendTo="@(body)" modal="true" closable="false">
+				<h:form id="formItemProdutoDialog">					
+			        <h:panelGrid columns="1">
+						<p:outputLabel for="profissional" value="Profissional" />						
+			            <p:autoComplete value="#{comandaMB.itemSelecionado.profissional}" completeMethod="#{comandaMB.pesquisarProfissional}" converter="profissionalConverter"
+			        	var="profissional" itemValue="#{profissional}" itemLabel="#{profissional.nome}" dropdown="true" forceSelection="true" minQueryLength="2" id="profissional"/>			        
+			        </h:panelGrid>
+			        <h:panelGrid columns="1">			            
+			        	<p:outputLabel for="produtoList" value="Produto" />
+			        	<p:pickList id="produtoList" value="#{comandaMB.dualProdutos}" var="produto" itemLabel="#{produto}" itemValue="#{produto}"
+			        			showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="produtoConverter">
+			        		<f:facet name="sourceCaption">Disponíveis</f:facet>
+        					<f:facet name="targetCaption">Selecionados</f:facet>
+			        	</p:pickList>			           
+			        </h:panelGrid>
+			         <h:panelGrid columns="2" cellspacing="8">	  	
+			            <p:commandButton value="Incluir" actionListener="#{comandaMB.incluirProduto()}" oncomplete="PF('itemProdutoDialog').hide()" update=":messages, :formListItens,:subTotal" icon="fa fa-check"/>
+			            <p:commandButton value="Cancelar" onclick="PF('itemProdutoDialog').hide()" update=":messages" icon="fa fa-close"/>	  
+			        </h:panelGrid>
+		        </h:form>	
+		    </p:dialog>
+		</ui:define>
+	</ui:composition>
+</html>

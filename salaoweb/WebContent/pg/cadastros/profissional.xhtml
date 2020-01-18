@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<ui:composition template="/WEB-INF/template/principal.xhtml">
+		<ui:define name="conteudo-esquerdo">
+			<p:panel header="Novo Profissional">
+				<h:form id="formProfissional">
+					<h:panelGrid columns="1">
+						<p:outputLabel value="Nome" for="nome"/>
+						<p:inputText id="nome" size="28" value="#{profissionalMB.profissional.nome}" autocomplete="off"/>
+						<p:outputLabel value="E-mal" for="email"/>
+						<p:inputText id="email" size="28" value="#{profissionalMB.profissional.email}" autocomplete="off"/>
+						<p:outputLabel value="Telefone" for="telefone"/>
+						<p:inputMask id="telefone" size="15" value="#{profissionalMB.profissional.telefone}"  mask="9999-9999" autocomplete="off"/>
+						<p:outputLabel value="Celular" for="celular"/>
+						<p:inputMask id="celular" size="15" value="#{profissionalMB.profissional.celular}" mask="99999-9999" autocomplete="off"/>	
+						<p:outputLabel value="Salário Fixo?"/>
+						<p:selectBooleanCheckbox value="#{profissionalMB.profissional.salarioFixo}"/>
+						<p:outputLabel value=""/>					
+						<p:commandButton value="Enviar" actionListener="#{profissionalMB.salvar()}" update=":formListProfissionais, :messages, formProfissional"/>		
+					</h:panelGrid>
+				</h:form>				
+			</p:panel>
+		</ui:define>	
+		<ui:define name="conteudo">		
+			<div class="conteudo-cadastros">				
+				<h2 style="margin:0;"><span style="color: #848484;">Cadastros &gt; </span> Profissional</h2>	
+				<p:separator style="width:980px; float:left; height:10px;"/>
+				<p:messages id="messages" showDetail="true" autoUpdate="false" showSummary="false"/>
+				<h:form>
+					<h:panelGrid columns="2" cellspacing="8">
+						<p:outputLabel value="Listar"/>					
+						<p:selectOneRadio id="opLista" value="#{profissionalMB.ativo}">
+							<p:ajax event="change" listener="#{profissionalMB.listar()}" process="@this" update=":formListProfissionais, :messages" />
+			            	<f:selectItem itemLabel="Ativos" itemValue="1"/>
+			            	<f:selectItem itemLabel="Inativos" itemValue="0"/>			            	
+		        		</p:selectOneRadio>					
+					</h:panelGrid>
+				</h:form>				
+				<h:form id="formListProfissionais">					
+					<p:dataTable id="listaProfissionais" var="profissional" value="#{profissionalMB.profissionais}"  
+			                 paginator="true" rows="10"  
+			                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"  
+			                 rowsPerPageTemplate="5,10,15,20,30"
+			                 rowKey="#{profissional.id}"
+			                 selectionMode="single">			            
+			            <p:column headerText="Id" width="50" style="text-align: center;"> 			             
+				       		 <h:outputText value="#{profissional.id}"/>  
+				        </p:column>		       		  
+				        <p:column headerText="Nome" filterBy="#{profissional.nome}" filterMatchMode="contains"> 			             
+				            <h:outputText value="#{profissional.nome}"/>  
+				        </p:column> 
+				        <p:column headerText="Salário Fixo?" width="70"> 			             
+				            <h:outputText value="#{profissional.salarioFixo ==  true ? 'Sim' : 'Não'}"/>  
+				        </p:column>
+				        <p:column headerText="Telefone" width="110" filterBy="#{profissional.telefone}" filterMatchMode="contains"> 			             
+				            <h:outputText value="#{profissional.telefone}"/>				          
+				        </p:column>			        		  
+				        <p:column headerText="Celular" width="110" filterBy="#{profissional.telefone}" filterMatchMode="contains"> 			             
+				            <h:outputText value="#{profissional.celular}"/>  
+				        </p:column>				     
+				        <p:column headerText="Editar" width="55" style="text-align: center;"> 
+				        	<p:commandButton update=":formProfissionalEditar, :messages" icon="fa fa-edit" title="Editar Profissional" oncomplete="PF('editarDialog').show()">
+				            	<f:setPropertyActionListener target="#{profissionalMB.profissionalEditar}" value="#{profissional}"/>
+				            </p:commandButton>			        	 		            
+				        </p:column>
+				        <p:column headerText="Excluir" width="55" style="text-align: center;"> 		
+					        <p:commandButton update="formListProfissionais, :messages" icon="fa fa-close" title="Excluir Profissional" action="#{profissionalMB.excluir()}" disabled="#{profissionalMB.bloquearExcluir}">
+				            	<f:setPropertyActionListener target="#{profissionalMB.profissionalEditar}" value="#{profissional}"/>
+				            </p:commandButton>		         	  			            
+				        </p:column>				        
+			        </p:dataTable>
+				</h:form>
+			</div>
+			<h:form id="formProfissionalEditar">
+				<p:dialog header="Editar Profissional" widgetVar="editarDialog" resizable="false" id="editarDlg" modal="false">					
+					<h:panelGrid columns="1" cellspacing="8">
+						<p:outputLabel value="Nome" for="nome"/>
+						<p:inputText id="nome" size="28" value="#{profissionalMB.profissionalEditar.nome}" autocomplete="off"/>
+						<p:outputLabel value="E-mal" for="email"/>
+						<p:inputText id="email" size="28" value="#{profissionalMB.profissionalEditar.email}" autocomplete="off"/>
+						<p:outputLabel value="Telefone" for="telefone"/>
+						<p:inputMask id="telefone" size="15" value="#{profissionalMB.profissionalEditar.telefone}"  mask="9999-9999" autocomplete="off"/>
+						<p:outputLabel value="Celular" for="celular"/>
+						<p:inputMask id="celular" size="15" value="#{profissionalMB.profissionalEditar.celular}" mask="99999-9999" autocomplete="off"/>								
+					</h:panelGrid>
+					<h:panelGrid columns="2" cellspacing="8">					
+						<p:outputLabel value="Salário Fixo?"/>
+						<p:selectBooleanCheckbox value="#{profissionalMB.profissionalEditar.salarioFixo}"/>
+						<p:outputLabel value="Ativo" rendered="#{profissionalMB.bloquearExcluir}"/>
+						<p:selectBooleanCheckbox value="#{profissionalMB.profissionalEditar.ativo}" rendered="#{profissionalMB.bloquearExcluir}"/>
+						<p:outputLabel value=""/>
+						<p:outputLabel value=""/>								
+						<p:commandButton value="Enviar" actionListener="#{profissionalMB.alterar()}" update=":formListProfissionais, :messages, formProfissionalEditar"/>		
+					</h:panelGrid>				
+                </p:dialog>				
+			</h:form>	
+		</ui:define>
+	</ui:composition>
+</html>
